@@ -114,6 +114,25 @@ export async function toggleWishlist(id: string, isWishlisted: boolean): Promise
   return updateRecipe(id, { isWishlisted });
 }
 
+export async function deleteRecipe(id: string): Promise<void> {
+  // If Supabase is not configured, just return
+  if (!supabase) {
+    return;
+  }
+
+  try {
+    const { error } = await supabase
+      .from('recipes')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
+  } catch (error) {
+    console.error('Error deleting recipe:', error);
+    throw error;
+  }
+}
+
 // Mock data for development
 function getMockRecipes(): Recipe[] {
   return [

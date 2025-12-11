@@ -6,6 +6,7 @@ import {
   updateRecipeRating,
   toggleWishlist,
   updateRecipe,
+  deleteRecipe,
 } from '@/services/recipesApi';
 
 interface RecipesState {
@@ -15,6 +16,8 @@ interface RecipesState {
   isLoading: boolean;
   loadRecipes: () => Promise<void>;
   addRecipe: (recipe: Omit<Recipe, 'id' | 'createdAt'>) => Promise<void>;
+  editRecipe: (id: string, recipe: Partial<Omit<Recipe, 'id' | 'createdAt'>>) => Promise<void>;
+  deleteRecipeById: (id: string) => Promise<void>;
   updateRating: (id: string, rating: number) => Promise<void>;
   toggleWishlistStatus: (id: string) => Promise<void>;
   setSelectedCuisine: (cuisine: Cuisine) => void;
@@ -48,6 +51,32 @@ export const useRecipesStore = create<RecipesState>((set, get) => ({
       }));
     } catch (error) {
       console.error('Error adding recipe:', error);
+      throw error;
+    }
+  },
+
+  editRecipe: async (id, updates) => {
+    try {
+      const updatedRecipe = await updateRecipe(id, updates as Partial<Recipe>);
+      set((state) => ({
+        recipes: state.recipes.map((r) =>
+          r.id === id ? updatedRecipe : r
+        ),
+      }));
+    } catch (error) {
+      console.error('Error editing recipe:', error);
+      throw error;
+    }
+  },
+
+  deleteRecipeById: async (id) => {
+    try {
+      await deleteRecipe(id);
+      set((state) => ({
+        recipes: state.recipes.filter((r) => r.id !== id),
+      }));
+    } catch (error) {
+      console.error('Error deleting recipe:', error);
       throw error;
     }
   },

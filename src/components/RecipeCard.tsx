@@ -1,5 +1,6 @@
+import React from 'react';
 import { motion } from 'framer-motion';
-import { Heart, ExternalLink } from 'lucide-react';
+import { Heart, ExternalLink, Edit, Trash2 } from 'lucide-react';
 import { Recipe } from '@/types/Recipe';
 import { RatingStars } from './RatingStars';
 import { Badge } from './ui/badge';
@@ -10,15 +11,40 @@ import { cn } from '@/utils/cn';
 interface RecipeCardProps {
   recipe: Recipe;
   index?: number;
+  onEditClick?: () => void;
 }
 
-export function RecipeCard({ recipe, index = 0 }: RecipeCardProps) {
-  const { toggleWishlistStatus } = useRecipesStore();
+export function RecipeCard({ recipe, index = 0, onEditClick }: RecipeCardProps) {
+  const { toggleWishlistStatus, deleteRecipeById } = useRecipesStore();
   const navigate = useNavigate();
+  const [isDeleting, setIsDeleting] = React.useState(false);
 
   const handleWishlistToggle = (e: React.MouseEvent) => {
     e.stopPropagation();
     toggleWishlistStatus(recipe.id);
+  };
+
+  const handleDelete = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!window.confirm('Are you sure you want to delete this recipe?')) {
+      return;
+    }
+
+    setIsDeleting(true);
+    try {
+      await deleteRecipeById(recipe.id);
+    } catch (error) {
+      console.error('Error deleting recipe:', error);
+      alert('Failed to delete recipe');
+      setIsDeleting(false);
+    }
+  };
+
+  const handleEdit = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onEditClick) {
+      onEditClick();
+    }
   };
 
   const handleCardClick = () => {
@@ -58,6 +84,19 @@ export function RecipeCard({ recipe, index = 0 }: RecipeCardProps) {
             <Heart
               className={cn('w-5 h-5', recipe.isWishlisted && 'fill-current')}
             />
+          </button>
+          <button
+            onClick={handleEdit}
+            className="p-2 rounded-full bg-white/90 backdrop-blur-sm text-gray-400 hover:text-blue-500 transition-colors"
+          >
+            <Edit className="w-5 h-5" />
+          </button>
+          <button
+            onClick={handleDelete}
+            disabled={isDeleting}
+            className="p-2 rounded-full bg-white/90 backdrop-blur-sm text-gray-400 hover:text-red-500 transition-colors disabled:opacity-50"
+          >
+            <Trash2 className="w-5 h-5" />
           </button>
         </div>
         <div className="absolute bottom-2 left-2">

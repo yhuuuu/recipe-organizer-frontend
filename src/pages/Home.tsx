@@ -5,17 +5,26 @@ import { useRecipesStore } from '@/store/recipesStore';
 import { RecipeCard } from '@/components/RecipeCard';
 import { FilterBar } from '@/components/FilterBar';
 import { AddRecipeModal } from '@/components/AddRecipeModal';
+import { EditRecipeModal } from '@/components/EditRecipeModal';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Recipe } from '@/types/Recipe';
 
 export function Home() {
   const { loadRecipes, getFilteredRecipes, setSearchQuery, searchQuery, isLoading } = useRecipesStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const recipes = getFilteredRecipes();
 
   useEffect(() => {
     loadRecipes();
   }, [loadRecipes]);
+
+  const handleEditClick = (recipe: Recipe) => {
+    setSelectedRecipe(recipe);
+    setEditModalOpen(true);
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -77,13 +86,25 @@ export function Home() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {recipes.map((recipe, index) => (
-              <RecipeCard key={recipe.id} recipe={recipe} index={index} />
+              <RecipeCard 
+                key={recipe.id} 
+                recipe={recipe} 
+                index={index}
+                onEditClick={() => handleEditClick(recipe)}
+              />
             ))}
           </div>
         )}
       </div>
 
       <AddRecipeModal open={isModalOpen} onOpenChange={setIsModalOpen} />
+      {selectedRecipe && (
+        <EditRecipeModal 
+          open={editModalOpen}
+          onOpenChange={setEditModalOpen}
+          recipe={selectedRecipe}
+        />
+      )}
     </div>
   );
 }

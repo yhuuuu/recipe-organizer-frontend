@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Heart, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Heart, ExternalLink, Edit, Trash2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useRecipesStore } from '@/store/recipesStore';
 import { RatingStars } from '@/components/RatingStars';
+import { EditRecipeModal } from '@/components/EditRecipeModal';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Recipe } from '@/types/Recipe';
@@ -12,9 +13,11 @@ import { fetchRecipeById } from '@/services/recipesApi';
 export function RecipeDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { updateRating, toggleWishlistStatus, recipes } = useRecipesStore();
+  const { updateRating, toggleWishlistStatus, deleteRecipeById, recipes } = useRecipesStore();
   const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     const loadRecipe = async () => {
@@ -71,8 +74,29 @@ export function RecipeDetail() {
     setRecipe({ ...recipe, isWishlisted: !recipe.isWishlisted });
   };
 
+  const handleDelete = async () => {
+    if (!window.confirm('Are you sure you want to delete this recipe?')) {
+      return;
+    }
+
+    setIsDeleting(true);
+    try {
+      await deleteRecipeById(recipe.id);
+      navigate('/');
+    } catch (error) {
+      console.error('Error deleting recipe:', error);
+      alert('Failed to delete recipe. Please try again.');
+      setIsDeleting(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
+      <EditRecipeModal 
+        open={editModalOpen} 
+        onOpenChange={setEditModalOpen}
+        recipe={recipe}
+      />
       <div className="container mx-auto px-4 py-8">
         <motion.button
           initial={{ opacity: 0, x: -20 }}
@@ -137,6 +161,21 @@ export function RecipeDetail() {
                     <ExternalLink className="w-5 h-5" />
                   </Button>
                 )}
+                <Button
+                  variant="outline"
+                  onClick={() => setEditModalOpen(true)}
+                  size="icon"
+                >
+                  <Edit className="w-5 h-5" />
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={handleDelete}
+                  disabled={isDeleting}
+                  size="icon"
+                >
+                  <Trash2 className="w-5 h-5" />
+                </Button>
               </div>
             </div>
           </div>
