@@ -8,4 +8,4 @@ afterEach(() => {
 });
 
 // Mock window.alert
-global.alert = vi.fn();
+globalThis.alert = vi.fn();

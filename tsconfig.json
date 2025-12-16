@@ -20,6 +20,9 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
 
+    /* Testing */
+    "types": ["vite/client", "vitest/globals"],
+
     /* Path aliases */
     "baseUrl": ".",
     "paths": {

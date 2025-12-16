@@ -103,7 +103,7 @@ describe('EditRecipeModal', () => {
 
     // Verify alert was called
     await waitFor(() => {
-      expect(global.alert).toHaveBeenCalledWith('Please enter a recipe title');
+      expect(globalThis.alert).toHaveBeenCalledWith('Please enter a recipe title');
     });
 
     // Verify editRecipe was not called
@@ -136,7 +136,7 @@ describe('EditRecipeModal', () => {
 
     // Verify alert was called
     await waitFor(() => {
-      expect(global.alert).toHaveBeenCalledWith(
+      expect(globalThis.alert).toHaveBeenCalledWith(
         'Please provide at least one ingredient and one step'
       );
     });
@@ -171,7 +171,7 @@ describe('EditRecipeModal', () => {
 
     // Verify alert was called
     await waitFor(() => {
-      expect(global.alert).toHaveBeenCalledWith(
+      expect(globalThis.alert).toHaveBeenCalledWith(
         'Please provide at least one ingredient and one step'
       );
     });
