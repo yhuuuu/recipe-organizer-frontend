@@ -89,7 +89,7 @@ export const useRecipesStore = create<RecipesState>((set, get) => ({
       ),
     }));
 
-    // Try to update in Supabase (if configured)
+    // Try to update via API
     try {
       const updatedRecipe = await updateRecipeRating(id, rating);
       set((state) => ({
@@ -98,7 +98,7 @@ export const useRecipesStore = create<RecipesState>((set, get) => ({
         ),
       }));
     } catch (error) {
-      // If Supabase is not configured, the optimistic update is already done
+      // If API is not available, the optimistic update is already done
       console.warn('Rating update (using local state only):', error);
     }
   },
@@ -116,7 +116,7 @@ export const useRecipesStore = create<RecipesState>((set, get) => ({
       ),
     }));
 
-    // Try to update in Supabase (if configured)
+    // Try to update via API
     try {
       const updatedRecipe = await toggleWishlist(id, newWishlistStatus);
       set((state) => ({
@@ -125,7 +125,7 @@ export const useRecipesStore = create<RecipesState>((set, get) => ({
         ),
       }));
     } catch (error) {
-      // If Supabase is not configured, the optimistic update is already done
+      // If API is not available, the optimistic update is already done
       console.warn('Wishlist update (using local state only):', error);
     }
   },

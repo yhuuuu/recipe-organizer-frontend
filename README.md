@@ -1,6 +1,6 @@
 # Recipe Organizer Web Application
 
-A modern, full-featured recipe organizer web application built with React, TypeScript, and Supabase. Save, organize, and view recipes from online sources with AI-powered extraction.
+A modern, full-featured recipe organizer web application built with React, TypeScript, and MongoDB. Save, organize, and view recipes from online sources with AI-powered extraction.
 
 ## Features
 
@@ -20,7 +20,7 @@ A modern, full-featured recipe organizer web application built with React, TypeS
 - **UI Components**: shadcn/ui
 - **Animations**: Framer Motion
 - **State Management**: Zustand
-- **Backend**: Supabase (PostgreSQL + Auth + Storage)
+- **Backend**: MongoDB Atlas
 - **Routing**: React Router v6
 
 ## Getting Started
@@ -28,7 +28,7 @@ A modern, full-featured recipe organizer web application built with React, TypeS
 ### Prerequisites
 
 - Node.js 18+ and npm/yarn/pnpm
-- A Supabase account (free tier works)
+- MongoDB Atlas account (free tier works)
 
 ### Installation
 
@@ -44,55 +44,33 @@ cd "Recipe Organizer"
 npm install
 ```
 
-3. **Set up Supabase**
+3. **Set up MongoDB Atlas**
 
-   - Create a new project at [supabase.com](https://supabase.com)
-   - Go to SQL Editor and run this SQL to create the recipes table:
-
-```sql
-CREATE TABLE recipes (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  title TEXT NOT NULL,
-  image TEXT,
-  ingredients TEXT[] NOT NULL,
-  steps TEXT[] NOT NULL,
-  cuisine TEXT NOT NULL,
-  sourceUrl TEXT,
-  rating INTEGER DEFAULT 0 CHECK (rating >= 0 AND rating <= 5),
-  isWishlisted BOOLEAN DEFAULT false,
-  createdAt TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
--- Enable Row Level Security (optional, for multi-user support)
-ALTER TABLE recipes ENABLE ROW LEVEL SECURITY;
-
--- Create a policy to allow all operations (adjust based on your auth needs)
-CREATE POLICY "Allow all operations" ON recipes
-  FOR ALL
-  USING (true)
-  WITH CHECK (true);
-```
+   - Create a new project at [MongoDB Atlas](https://cloud.mongodb.com/)
+   - Create a cluster and database
+   - Get your connection string
 
 4. **Configure environment variables**
 
-   - Copy `.env.example` to `.env`:
-   ```bash
-   cp .env.example .env
+   - The `.env` file should contain:
+   ```
+   VITE_API_BASE_URL=http://localhost:4000/api
    ```
 
-   - Fill in your Supabase credentials:
-   ```
-   VITE_SUPABASE_URL=https://your-project.supabase.co
-   VITE_SUPABASE_ANON_KEY=your-anon-key
-   ```
+5. **Set up your backend server**
 
-5. **Start the development server**
+   You need a separate backend server running on port 4000. The backend should:
+   - Connect to your MongoDB Atlas database
+   - Provide REST API endpoints for recipes CRUD operations
+   - Handle the connection string: `mongodb+srv://username:password@cluster.mongodb.net/recipe-organizer`
+
+6. **Start the development server**
 
 ```bash
 npm run dev
 ```
 
-6. **Open your browser**
+7. **Open your browser**
 
 Navigate to `http://localhost:5173`
 
@@ -113,9 +91,10 @@ src/
 ├── store/              # Zustand state management
 │   └── recipesStore.ts
 ├── services/           # API and external services
-│   ├── supabaseClient.ts
 │   ├── recipesApi.ts
-│   └── aiExtractor.ts
+│   ├── aiExtractor.ts
+│   ├── textExtractor.ts
+│   └── videoExtractor.ts
 ├── types/              # TypeScript type definitions
 │   └── Recipe.ts
 ├── utils/              # Utility functions
@@ -200,7 +179,7 @@ The app can detect and extract recipes from:
 
 ## Mock Data
 
-The app includes mock recipe data that will be used if Supabase is not configured. This allows you to see the UI in action immediately after installation.
+The app includes mock recipe data that will be used if the backend API is not available. This allows you to see the UI in action immediately after installation.
 
 ## Building for Production
 

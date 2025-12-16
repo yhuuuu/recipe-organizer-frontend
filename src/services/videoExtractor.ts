@@ -161,8 +161,8 @@ function getDefaultThumbnail(platform: VideoPlatform, videoId: string): string {
  * This MUST be done via backend due to CORS and API requirements
  */
 export async function fetchVideoCaptions(
-  platform: VideoPlatform,
-  videoId: string
+  _platform: VideoPlatform,
+  _videoId: string
 ): Promise<string> {
   // In production, call your backend API:
   // POST /api/video/captions

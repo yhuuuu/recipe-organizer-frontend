@@ -115,10 +115,10 @@ A full recipe page includes:
 
 ### 4.2 Backend
 
-- Option A: Node.js + Express + MongoDB
+- Option A: Node.js + Express + MongoDB ✅ (Selected)
 - Option B: Supabase (Postgres + Auth)
 
-Recommended: Supabase for faster development.
+Recommended: MongoDB for flexibility and scalability.
 
 **API Endpoints (if using own backend):**
 

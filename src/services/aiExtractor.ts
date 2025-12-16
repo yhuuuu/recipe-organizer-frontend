@@ -294,7 +294,7 @@ function extractRecipeTitle(content: string, sourceUrl: string): string {
  * Extracts ingredients from content
  * Only extracts from marked sections to avoid mixing with steps
  */
-function extractIngredients(content: string, lines: string[]): string[] {
+function extractIngredients(content: string, _lines: string[]): string[] {
   const ingredients: string[] = [];
   
   // Find where the method section starts to avoid extracting from steps
@@ -356,7 +356,7 @@ function extractIngredients(content: string, lines: string[]): string[] {
  * Extracts cooking steps from content
  * Improved to properly split numbered steps and handle sub-steps
  */
-function extractSteps(content: string, lines: string[]): string[] {
+function extractSteps(content: string, _lines: string[]): string[] {
   const steps: string[] = [];
   
   // Find the method section

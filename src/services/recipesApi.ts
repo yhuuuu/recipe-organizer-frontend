@@ -1,108 +1,84 @@
-import { supabase } from './supabaseClient';
 import { Recipe } from '@/types/Recipe';
 
-export async function fetchRecipes(): Promise<Recipe[]> {
-  // Return mock data if Supabase is not configured
-  if (!supabase) {
-    return getMockRecipes();
-  }
+const BASE = (import.meta.env.VITE_API_BASE_URL as string) || 'http://localhost:4000/api';
 
+async function apiFetch<T = any>(path: string, opts: RequestInit = {}): Promise<T> {
+  const url = `${BASE}${path}`;
   try {
-    const { data, error } = await supabase
-      .from('recipes')
-      .select('*')
-      .order('createdAt', { ascending: false });
+    const res = await fetch(url, {
+      headers: { 'Content-Type': 'application/json', ...(opts.headers || {}) },
+      ...opts,
+    });
 
-    if (error) throw error;
-    return data || [];
-  } catch (error) {
-    console.error('Error fetching recipes:', error);
-    // Return mock data if Supabase query fails
+    if (!res.ok) {
+      const text = await res.text().catch(() => '');
+      throw new Error(`Request failed ${res.status} ${res.statusText}: ${text}`);
+    }
+
+    // No content
+    if (res.status === 204) return null as unknown as T;
+
+    const data = await res.json().catch(() => null);
+    return data as T;
+  } catch (err) {
+    // Re-throw to let callers decide to fallback to mock data
+    throw err;
+  }
+}
+
+export async function fetchRecipes(): Promise<Recipe[]> {
+  try {
+    const recipes = await apiFetch<any[]>('/recipes');
+    // Map MongoDB _id to id for frontend compatibility
+    return recipes.map(recipe => ({
+      ...recipe,
+      id: recipe._id || recipe.id,
+    }));
+  } catch (err) {
+    console.warn('fetchRecipes failed, falling back to mock data:', err);
     return getMockRecipes();
   }
 }
 
 export async function fetchRecipeById(id: string): Promise<Recipe | null> {
-  // Return mock data if Supabase is not configured
-  if (!supabase) {
-    const mockRecipes = getMockRecipes();
-    return mockRecipes.find(r => r.id === id) || null;
-  }
-
   try {
-    const { data, error } = await supabase
-      .from('recipes')
-      .select('*')
-      .eq('id', id)
-      .single();
-
-    if (error) throw error;
-    return data;
-  } catch (error) {
-    console.error('Error fetching recipe:', error);
-    // Try to find in mock data as fallback
-    const mockRecipes = getMockRecipes();
-    return mockRecipes.find(r => r.id === id) || null;
+    const recipe = await apiFetch<any>(`/recipes/${id}`);
+    // Map MongoDB _id to id for frontend compatibility
+    return {
+      ...recipe,
+      id: recipe._id || recipe.id,
+    };
+  } catch (err) {
+    console.warn('fetchRecipeById failed, falling back to mock data:', err);
+    return getMockRecipes().find((r) => r.id === id) || null;
   }
 }
 
 export async function createRecipe(recipe: Omit<Recipe, 'id' | 'createdAt'>): Promise<Recipe> {
-  // Return mock recipe if Supabase is not configured
-  if (!supabase) {
-    return {
-      id: Date.now().toString(),
-      ...recipe,
-      createdAt: new Date().toISOString(),
-    };
-  }
-
   try {
-    const { data, error } = await supabase
-      .from('recipes')
-      .insert([{
-        ...recipe,
-        createdAt: new Date().toISOString(),
-      }])
-      .select()
-      .single();
-
-    if (error) throw error;
-    return data;
-  } catch (error) {
-    console.error('Error creating recipe:', error);
-    // Return mock recipe if Supabase insert fails
+    const createdRecipe = await apiFetch<any>('/recipes', { method: 'POST', body: JSON.stringify(recipe) });
+    // Map MongoDB _id to id for frontend compatibility
     return {
-      id: Date.now().toString(),
-      ...recipe,
-      createdAt: new Date().toISOString(),
+      ...createdRecipe,
+      id: createdRecipe._id || createdRecipe.id,
     };
+  } catch (err) {
+    console.warn('createRecipe failed, falling back to mock creation:', err);
+    return { id: Date.now().toString(), ...recipe, createdAt: new Date().toISOString() } as Recipe;
   }
 }
 
 export async function updateRecipe(id: string, updates: Partial<Recipe>): Promise<Recipe> {
-  // If Supabase is not configured, return updated mock recipe
-  if (!supabase) {
-    const mockRecipes = getMockRecipes();
-    const existingRecipe = mockRecipes.find(r => r.id === id);
-    if (!existingRecipe) {
-      throw new Error('Recipe not found');
-    }
-    return { ...existingRecipe, ...updates };
-  }
-
   try {
-    const { data, error } = await supabase
-      .from('recipes')
-      .update(updates)
-      .eq('id', id)
-      .select()
-      .single();
-
-    if (error) throw error;
-    return data;
-  } catch (error) {
-    console.error('Error updating recipe:', error);
-    throw error;
+    const updatedRecipe = await apiFetch<any>(`/recipes/${id}`, { method: 'PATCH', body: JSON.stringify(updates) });
+    // Map MongoDB _id to id for frontend compatibility
+    return {
+      ...updatedRecipe,
+      id: updatedRecipe._id || updatedRecipe.id,
+    };
+  } catch (err) {
+    console.error('Error updating recipe:', err);
+    throw err;
   }
 }
 
@@ -115,25 +91,15 @@ export async function toggleWishlist(id: string, isWishlisted: boolean): Promise
 }
 
 export async function deleteRecipe(id: string): Promise<void> {
-  // If Supabase is not configured, just return
-  if (!supabase) {
-    return;
-  }
-
   try {
-    const { error } = await supabase
-      .from('recipes')
-      .delete()
-      .eq('id', id);
-
-    if (error) throw error;
-  } catch (error) {
-    console.error('Error deleting recipe:', error);
-    throw error;
+    await apiFetch<void>(`/recipes/${id}`, { method: 'DELETE' });
+  } catch (err) {
+    console.error('Error deleting recipe via API:', err);
+    throw err;
   }
 }
 
-// Mock data for development
+// Mock data for development fallback
 function getMockRecipes(): Recipe[] {
   return [
     {
@@ -145,7 +111,7 @@ function getMockRecipes(): Recipe[] {
         'Boil pasta according to package instructions',
         'Sauté minced garlic in butter until fragrant',
         'Add heavy cream and bring to a simmer',
-        'Combine pasta with sauce and season to taste'
+        'Combine pasta with sauce and season to taste',
       ],
       cuisine: 'Italian',
       sourceUrl: 'https://example.com/recipe1',
@@ -162,7 +128,7 @@ function getMockRecipes(): Recipe[] {
         'Cut tofu into cubes',
         'Sauté ground pork until browned',
         'Add doubanjiang and aromatics',
-        'Add tofu and simmer until flavors meld'
+        'Add tofu and simmer until flavors meld',
       ],
       cuisine: 'Chinese',
       sourceUrl: 'https://example.com/recipe2',
@@ -179,7 +145,7 @@ function getMockRecipes(): Recipe[] {
         'Cook ramen noodles according to package',
         'Prepare tonkatsu broth base',
         'Top with sliced pork belly, egg, and nori',
-        'Garnish with scallions'
+        'Garnish with scallions',
       ],
       cuisine: 'Japanese',
       sourceUrl: 'https://example.com/recipe3',
