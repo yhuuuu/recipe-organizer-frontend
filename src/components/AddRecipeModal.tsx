@@ -299,7 +299,7 @@ export function AddRecipeModal({ open, onOpenChange }: AddRecipeModalProps) {
         <DialogHeader>
           <DialogTitle>Add New Recipe</DialogTitle>
           <DialogDescription>
-            Paste a URL (website, YouTube, Bilibili, Instagram, or Xiaohongshu video) to extract recipe information automatically, or enter details manually.
+            Paste a recipe website URL to extract information automatically, or enter details manually.
           </DialogDescription>
         </DialogHeader>
 
@@ -333,7 +333,7 @@ export function AddRecipeModal({ open, onOpenChange }: AddRecipeModalProps) {
                   <div className="flex gap-2">
                     <Input
                       type="url"
-                      placeholder="支持网页、YouTube、Bilibili、Instagram、小红书视频链接"
+                      placeholder="输入食谱网页链接（如下厨房、豆果美食、AllRecipes等）"
                       value={url}
                       onChange={(e) => setUrl(e.target.value)}
                       onKeyDown={(e) => {

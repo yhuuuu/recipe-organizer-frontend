@@ -4,8 +4,8 @@ A modern, full-featured recipe organizer web application built with React, TypeS
 
 ## Features
 
-- 🍳 **AI-Powered Recipe Extraction** - Automatically extract recipe information from URLs
-- 🎥 **Video Support** - Extract recipes from YouTube, Bilibili, Instagram, and Xiaohongshu videos
+- 🍳 **AI-Powered Recipe Extraction** - Automatically extract recipe information from recipe website URLs
+- 📸 **Image Upload** - Upload or take photos for recipe covers
 - 📱 **Responsive Design** - Beautiful UI that works on all devices
 - ⭐ **Rating System** - Rate your favorite recipes
 - ❤️ **Wishlist** - Save recipes for later
