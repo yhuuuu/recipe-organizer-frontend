@@ -10,16 +10,22 @@ const BASE = (import.meta.env.VITE_API_BASE_URL as string) || 'http://localhost:
 
 /**
  * Extract recipe using backend API
- * @param text - The text content to extract recipe from
- * @param url - Optional source URL
+ * @param text - The text content to extract recipe from (optional if url is provided)
+ * @param url - Optional source URL to scrape and extract
  * @returns Extracted recipe data
  */
 export async function extractRecipeFromBackend(
-  text: string, 
+  text: string = '', 
   url?: string
 ): Promise<ExtractedRecipe> {
   console.log('🔵 Calling backend /api/extract...');
-  console.log('Request data:', { text: text.substring(0, 200) + '...', url });
+  
+  // 构建请求体
+  const requestBody: { text?: string; url?: string } = {};
+  if (url) requestBody.url = url;
+  if (text) requestBody.text = text;
+  
+  console.log('Request data:', url ? { url } : { text: text.substring(0, 200) + '...' });
   
   try {
     const response = await fetch(`${BASE}/extract`, {
@@ -27,10 +33,7 @@ export async function extractRecipeFromBackend(
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ 
-        text, 
-        url: url || '' 
-      }),
+      body: JSON.stringify(requestBody),
     });
 
     console.log('Response status:', response.status, response.statusText);

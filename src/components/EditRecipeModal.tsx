@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Loader2 } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Loader2, Upload, Camera, X } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from './ui/dialog';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -26,6 +26,40 @@ export function EditRecipeModal({ open, onOpenChange, recipe }: EditRecipeModalP
     cuisine: 'Western' as Cuisine,
     sourceUrl: '',
   });
+
+  // 图片上传相关
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
+
+  // 处理图片文件转换为 Base64
+  const handleImageFile = (file: File) => {
+    if (!file.type.startsWith('image/')) {
+      alert('请选择图片文件');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64String = reader.result as string;
+      setFormData({ ...formData, image: base64String });
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // 上传图片
+  const handleUploadClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  // 拍照
+  const handleCameraClick = () => {
+    cameraInputRef.current?.click();
+  };
+
+  // 清除图片
+  const handleClearImage = () => {
+    setFormData({ ...formData, image: '' });
+  };
 
   // Initialize form data when recipe changes
   useEffect(() => {
@@ -103,24 +137,85 @@ export function EditRecipeModal({ open, onOpenChange, recipe }: EditRecipeModalP
 
           {/* Image URL */}
           <div>
-            <label className="block text-sm font-medium mb-2">Image URL</label>
-            <Input
-              placeholder="https://example.com/image.jpg"
-              value={formData.image}
-              onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-            />
+            <label className="block text-sm font-medium mb-2">封面图片</label>
+            
+            {/* 图片预览 */}
             {formData.image && (
-              <div className="mt-2 h-40 rounded-lg overflow-hidden">
-                <img
-                  src={formData.image}
-                  alt="Preview"
-                  className="w-full h-full object-cover"
+              <div className="relative mb-3">
+                <img 
+                  src={formData.image} 
+                  alt="Recipe preview" 
+                  className="w-full h-48 object-cover rounded-lg"
                   onError={(e) => {
                     (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=800';
                   }}
                 />
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="sm"
+                  className="absolute top-2 right-2"
+                  onClick={handleClearImage}
+                >
+                  <X className="w-4 h-4" />
+                </Button>
               </div>
             )}
+
+            {/* 上传按钮组 */}
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleUploadClick}
+                className="flex-1"
+              >
+                <Upload className="w-4 h-4 mr-2" />
+                上传图片
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleCameraClick}
+                className="flex-1"
+              >
+                <Camera className="w-4 h-4 mr-2" />
+                拍照
+              </Button>
+            </div>
+
+            {/* 隐藏的文件输入 */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) handleImageFile(file);
+              }}
+            />
+            <input
+              ref={cameraInputRef}
+              type="file"
+              accept="image/*"
+              capture="environment"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) handleImageFile(file);
+              }}
+            />
+
+            {/* 或者输入 URL */}
+            <div className="mt-2">
+              <Input
+                type="url"
+                value={formData.image.startsWith('data:') ? '' : formData.image}
+                onChange={(e) => setFormData({ ...formData, image: e.target.value })}
+                placeholder="或粘贴图片 URL"
+              />
+            </div>
           </div>
 
           {/* Cuisine */}
