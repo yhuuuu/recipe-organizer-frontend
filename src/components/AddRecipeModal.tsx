@@ -7,6 +7,7 @@ import { Badge } from './ui/badge';
 import { useRecipesStore } from '@/store/recipesStore';
 import { extractRecipeFromUrl } from '@/services/aiExtractor';
 import { extractRecipeFromText } from '@/services/textExtractor';
+import { extractRecipeFromBackend } from '@/services/backendExtractor';
 import { ExtractedRecipe, Cuisine } from '@/types/Recipe';
 import { RatingStars } from './RatingStars';
 
@@ -42,29 +43,57 @@ export function AddRecipeModal({ open, onOpenChange }: AddRecipeModalProps) {
       let extracted: ExtractedRecipe;
       
       if (inputMode === 'text') {
-        // Extract from text content directly
-        extracted = extractRecipeFromText(textContent);
-        // Also try AI extraction if OpenAI is available
-        const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
-        if (OPENAI_API_KEY) {
-          try {
-            const aiExtracted = await extractRecipeFromUrl(`text://${textContent}`);
-            // Use AI result if it's better (has more ingredients/steps)
-            if (aiExtracted.ingredients.length > extracted.ingredients.length ||
-                aiExtracted.steps.length > extracted.steps.length) {
-              extracted = aiExtracted;
+        // Try backend API first
+        try {
+          console.log('🔵 Attempting backend extraction for text content...');
+          extracted = await extractRecipeFromBackend(textContent);
+          console.log('✅ Backend extraction successful:', extracted);
+        } catch (backendError) {
+          console.warn('⚠️ Backend extraction failed, trying fallback methods:', backendError);
+          
+          // Fallback: Extract from text content directly
+          extracted = extractRecipeFromText(textContent);
+          
+          // Also try AI extraction if OpenAI is available
+          const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
+          if (OPENAI_API_KEY) {
+            try {
+              const aiExtracted = await extractRecipeFromUrl(`text://${textContent}`);
+              // Use AI result if it's better (has more ingredients/steps)
+              if (aiExtracted.ingredients.length > extracted.ingredients.length ||
+                  aiExtracted.steps.length > extracted.steps.length) {
+                extracted = aiExtracted;
+              }
+            } catch (e) {
+              // Fallback to text extraction
+              console.warn('AI extraction failed, using text extraction');
             }
-          } catch (e) {
-            // Fallback to text extraction
-            console.warn('AI extraction failed, using text extraction');
           }
         }
       } else {
         // Extract from URL
-        extracted = await extractRecipeFromUrl(url);
+        // Try backend API first for URL
+        try {
+          console.log('🔵 Attempting backend extraction for URL:', url);
+          extracted = await extractRecipeFromBackend('', url);
+          console.log('✅ Backend extraction successful:', extracted);
+        } catch (backendError) {
+          console.warn('⚠️ Backend extraction failed, trying fallback methods:', backendError);
+          extracted = await extractRecipeFromUrl(url);
+        }
       }
       
       setExtractedData(extracted);
+      
+      // 确保使用提取的数据填充表单字段
+      console.log('🔵 Filling form with extracted data:', {
+        title: extracted.title,
+        ingredients: extracted.ingredients,
+        steps: extracted.steps,
+        cuisine: extracted.cuisine,
+        image: extracted.image,
+      });
+      
       setFormData({
         title: extracted.title,
         image: extracted.image,
@@ -74,9 +103,101 @@ export function AddRecipeModal({ open, onOpenChange }: AddRecipeModalProps) {
         sourceUrl: inputMode === 'url' ? url : '',
         rating: 0,
       });
+      
+      console.log('✅ Form data updated successfully');
     } catch (error) {
-      console.error('Extraction error:', error);
-      alert('提取失败，请尝试手动输入或检查内容格式。');
+      console.error('❌ Extraction error:', error);
+      alert(`提取失败：${error instanceof Error ? error.message : '请尝试手动输入或检查内容格式'}`);
+    } finally {
+      setIsExtracting(false);
+    }
+  };
+
+  const handleExtractAndSave = async () => {
+    if (inputMode === 'url' && !url.trim()) return;
+    if (inputMode === 'text' && !textContent.trim()) return;
+
+    setIsExtracting(true);
+    try {
+      let extracted: ExtractedRecipe;
+
+      if (inputMode === 'text') {
+        // Try backend API first
+        try {
+          console.log('🔵 Attempting backend extraction for text content...');
+          extracted = await extractRecipeFromBackend(textContent);
+          console.log('✅ Backend extraction successful:', extracted);
+        } catch (backendError) {
+          console.warn('⚠️ Backend extraction failed, trying fallback methods:', backendError);
+          
+          extracted = extractRecipeFromText(textContent);
+          const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
+          if (OPENAI_API_KEY) {
+            try {
+              const aiExtracted = await extractRecipeFromUrl(`text://${textContent}`);
+              if (aiExtracted.ingredients.length > extracted.ingredients.length ||
+                  aiExtracted.steps.length > extracted.steps.length) {
+                extracted = aiExtracted;
+              }
+            } catch (e) {
+              console.warn('AI extraction failed, using text extraction');
+            }
+          }
+        }
+      } else {
+        // Try backend API first for URL
+        try {
+          console.log('🔵 Attempting backend extraction for URL:', url);
+          extracted = await extractRecipeFromBackend('', url);
+          console.log('✅ Backend extraction successful:', extracted);
+        } catch (backendError) {
+          console.warn('⚠️ Backend extraction failed, trying fallback methods:', backendError);
+          extracted = await extractRecipeFromUrl(url);
+        }
+      }
+
+      const ingredients = extracted.ingredients.map((i) => i.trim()).filter(Boolean);
+      const steps = extracted.steps.map((s) => s.trim()).filter(Boolean);
+
+      console.log('🔵 Saving recipe with data:', {
+        title: extracted.title || 'Untitled Recipe',
+        ingredients,
+        steps,
+        cuisine: extracted.cuisine,
+      });
+
+      await addRecipe({
+        title: extracted.title || 'Untitled Recipe',
+        image: extracted.image || 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=800',
+        ingredients,
+        steps,
+        cuisine: extracted.cuisine || ('Western' as Cuisine),
+        sourceUrl: inputMode === 'url' ? url : '',
+        rating: 0,
+        isWishlisted: false,
+      });
+
+      console.log('✅ Recipe saved successfully');
+
+      // Reset and close
+      setUrl('');
+      setTextContent('');
+      setExtractedData(null);
+      setFormData({
+        title: '',
+        image: '',
+        ingredients: '',
+        steps: '',
+        cuisine: 'Western',
+        sourceUrl: '',
+        rating: 0,
+      });
+      setManualMode(false);
+      setInputMode('url');
+      onOpenChange(false);
+    } catch (error) {
+      console.error('❌ Extraction+Save error:', error);
+      alert(`提取或保存失败：${error instanceof Error ? error.message : '请稍后重试或手动输入'}`);
     } finally {
       setIsExtracting(false);
     }
@@ -185,16 +306,32 @@ export function AddRecipeModal({ open, onOpenChange }: AddRecipeModalProps) {
                         if (e.key === 'Enter') handleExtract();
                       }}
                     />
-                    <Button onClick={handleExtract} disabled={isExtracting || !url.trim()}>
-                      {isExtracting ? (
-                        <>
-                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          提取中...
-                        </>
-                      ) : (
-                        'AI 提取'
-                      )}
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button onClick={handleExtract} disabled={isExtracting || !url.trim()}>
+                        {isExtracting ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            提取中...
+                          </>
+                        ) : (
+                          'AI 提取'
+                        )}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={handleExtractAndSave}
+                        disabled={isExtracting || !url.trim()}
+                      >
+                        {isExtracting ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            处理中...
+                          </>
+                        ) : (
+                          'AI 提取并添加'
+                        )}
+                      </Button>
+                    </div>
                   </div>
                 </div>
               ) : (
@@ -208,20 +345,36 @@ export function AddRecipeModal({ open, onOpenChange }: AddRecipeModalProps) {
                     value={textContent}
                     onChange={(e) => setTextContent(e.target.value)}
                   />
-                  <Button 
-                    onClick={handleExtract} 
-                    disabled={isExtracting || !textContent.trim()}
-                    className="w-full mt-2"
-                  >
-                    {isExtracting ? (
-                      <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        提取中...
-                      </>
-                    ) : (
-                      'AI 提取食谱'
-                    )}
-                  </Button>
+                  <div className="flex gap-2 mt-2">
+                    <Button
+                      onClick={handleExtract}
+                      disabled={isExtracting || !textContent.trim()}
+                      className="flex-1"
+                    >
+                      {isExtracting ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          提取中...
+                        </>
+                      ) : (
+                        'AI 提取食谱'
+                      )}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={handleExtractAndSave}
+                      disabled={isExtracting || !textContent.trim()}
+                    >
+                      {isExtracting ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          处理中...
+                        </>
+                      ) : (
+                        'AI 提取并添加'
+                      )}
+                    </Button>
+                  </div>
                 </div>
               )}
 
