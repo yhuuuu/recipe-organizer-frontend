@@ -36,17 +36,17 @@ export function AddRecipe() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    // 检查是否已登录
+    // Check if user is logged in
     if (!authService.isAuthenticated()) {
       navigate('/auth');
       return;
     }
   }, [navigate]);
 
-  // 从文本或 URL 提取菜谱
+  // Extract recipe from text or URL
   const handleExtract = async () => {
     if (!extractInput.trim()) {
-      setExtractError('请输入菜谱内容或 URL');
+      setExtractError('Please enter recipe content or URL');
       return;
     }
 
@@ -55,7 +55,7 @@ export function AddRecipe() {
       setExtractError('');
       const extracted = await recipeService.extractRecipe(extractInput);
       
-      // 使用提取的数据填充表单
+      // Fill form with extracted data
       setRecipe(prev => ({
         ...prev,
         title: extracted.title || '',
@@ -65,15 +65,15 @@ export function AddRecipe() {
         image: extracted.image || '',
         sourceUrl: extracted.sourceUrl || extractInput.startsWith('http') ? extractInput : ''
       }));
-      setExtractInput(''); // 清空提取输入框
+      setExtractInput(''); // Clear extraction input
     } catch (err) {
-      setExtractError(err instanceof Error ? err.message : '提取失败');
+      setExtractError(err instanceof Error ? err.message : 'Extraction failed');
     } finally {
       setExtractLoading(false);
     }
   };
 
-  // 添加食材
+  // Add ingredient
   const addIngredient = () => {
     if (ingredientInput.trim()) {
       setRecipe(prev => ({
@@ -84,7 +84,7 @@ export function AddRecipe() {
     }
   };
 
-  // 移除食材
+  // Remove ingredient
   const removeIngredient = (index: number) => {
     setRecipe(prev => ({
       ...prev,
@@ -92,7 +92,7 @@ export function AddRecipe() {
     }));
   };
 
-  // 添加步骤
+  // Add step
   const addStep = () => {
     if (stepInput.trim()) {
       setRecipe(prev => ({
@@ -103,7 +103,7 @@ export function AddRecipe() {
     }
   };
 
-  // 移除步骤
+  // Remove step
   const removeStep = (index: number) => {
     setRecipe(prev => ({
       ...prev,
@@ -111,22 +111,22 @@ export function AddRecipe() {
     }));
   };
 
-  // 保存菜谱
+  // Save recipe
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!recipe.title.trim()) {
-      setError('菜谱名称不能为空');
+      setError('Recipe name cannot be empty');
       return;
     }
     
     if (recipe.ingredients.length === 0) {
-      setError('请至少添加一个食材');
+      setError('Please add at least one ingredient');
       return;
     }
-    
+
     if (recipe.steps.length === 0) {
-      setError('请至少添加一个步骤');
+      setError('Please add at least one step');
       return;
     }
 
@@ -134,9 +134,9 @@ export function AddRecipe() {
       setLoading(true);
       setError('');
       await recipeService.createRecipe(recipe);
-      navigate('/'); // 保存成功后返回菜谱列表
+      navigate('/'); // Return to recipe list after successful save
     } catch (err) {
-      setError(err instanceof Error ? err.message : '保存失败');
+      setError(err instanceof Error ? err.message : 'Save failed');
     } finally {
       setLoading(false);
     }
@@ -144,7 +144,7 @@ export function AddRecipe() {
 
   return (
     <div style={{ maxWidth: '800px', margin: '20px auto', padding: '20px' }}>
-      <h1>添加新菜谱</h1>
+      <h1>Add New Recipe</h1>
 
       {error && (
         <div style={{ 
@@ -159,21 +159,21 @@ export function AddRecipe() {
         </div>
       )}
 
-      {/* 提取菜谱部分 */}
+      {/* Recipe extraction section */}
       <div style={{ 
         marginBottom: '30px', 
         padding: '15px', 
         backgroundColor: '#f0f0f0', 
         borderRadius: '4px' 
       }}>
-        <h3>快速提取菜谱（可选）</h3>
+        <h3>Quick Recipe Extraction (Optional)</h3>
         <p style={{ color: '#666', fontSize: '14px' }}>
-          粘贴菜谱文本或网址，自动提取信息：
+          Paste recipe text or URL to automatically extract information:
         </p>
         <textarea
           value={extractInput}
           onChange={(e) => setExtractInput(e.target.value)}
-          placeholder="粘贴菜谱文本或输入网址 (e.g., https://example.com/recipe)..."
+          placeholder="Paste recipe text or enter URL (e.g., https://example.com/recipe)..."
           style={{ 
             width: '100%', 
             height: '100px', 
@@ -202,22 +202,22 @@ export function AddRecipe() {
             opacity: extractLoading ? 0.6 : 1
           }}
         >
-          {extractLoading ? '提取中...' : '提取菜谱'}
+          {extractLoading ? 'Extracting...' : 'Extract Recipe'}
         </button>
       </div>
 
-      {/* 菜谱编辑表单 */}
+      {/* Recipe editing form */}
       <form onSubmit={handleSubmit}>
-        {/* 菜谱名称 */}
+        {/* Recipe Name */}
         <div style={{ marginBottom: '15px' }}>
           <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-            菜谱名称 <span style={{ color: 'red' }}>*</span>
+            Recipe Name <span style={{ color: 'red' }}>*</span>
           </label>
           <input
             type="text"
             value={recipe.title}
             onChange={(e) => setRecipe(prev => ({ ...prev, title: e.target.value }))}
-            placeholder="输入菜谱名称"
+            placeholder="Enter recipe name"
             style={{ 
               width: '100%', 
               padding: '10px', 
@@ -228,10 +228,10 @@ export function AddRecipe() {
           />
         </div>
 
-        {/* 菜系 */}
+        {/* Cuisine */}
         <div style={{ marginBottom: '15px' }}>
           <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-            菜系
+            Cuisine
           </label>
           <select
             value={recipe.cuisine}
@@ -257,10 +257,10 @@ export function AddRecipe() {
           </select>
         </div>
 
-        {/* 图片 URL */}
+        {/* Image URL */}
         <div style={{ marginBottom: '15px' }}>
           <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-            图片 URL
+            Image URL
           </label>
           <input
             type="url"
@@ -278,7 +278,7 @@ export function AddRecipe() {
           {recipe.image && (
             <img 
               src={recipe.image} 
-              alt="预览" 
+              alt="Preview" 
               style={{ 
                 width: '100%', 
                 maxHeight: '200px', 
@@ -290,10 +290,10 @@ export function AddRecipe() {
           )}
         </div>
 
-        {/* 源 URL */}
+        {/* Source URL */}
         <div style={{ marginBottom: '15px' }}>
           <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-            菜谱来源
+            Recipe Source
           </label>
           <input
             type="url"
@@ -310,10 +310,10 @@ export function AddRecipe() {
           />
         </div>
 
-        {/* 食材 */}
+        {/* Ingredients */}
         <div style={{ marginBottom: '15px' }}>
           <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-            食材 <span style={{ color: 'red' }}>*</span>
+            Ingredients <span style={{ color: 'red' }}>*</span>
           </label>
           <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
             <input
@@ -326,7 +326,7 @@ export function AddRecipe() {
                   addIngredient();
                 }
               }}
-              placeholder="输入食材..."
+              placeholder="Enter ingredient..."
               style={{ 
                 flex: 1, 
                 padding: '10px', 
@@ -348,7 +348,7 @@ export function AddRecipe() {
                 whiteSpace: 'nowrap'
               }}
             >
-              添加
+              Add
             </button>
           </div>
           <div>
@@ -379,17 +379,17 @@ export function AddRecipe() {
                     fontSize: '12px'
                   }}
                 >
-                  删除
+                  Delete
                 </button>
               </div>
             ))}
           </div>
         </div>
 
-        {/* 步骤 */}
+        {/* Steps */}
         <div style={{ marginBottom: '15px' }}>
           <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-            烹饪步骤 <span style={{ color: 'red' }}>*</span>
+            Cooking Steps <span style={{ color: 'red' }}>*</span>
           </label>
           <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
             <input
@@ -402,7 +402,7 @@ export function AddRecipe() {
                   addStep();
                 }
               }}
-              placeholder="输入步骤..."
+              placeholder="Enter step..."
               style={{ 
                 flex: 1, 
                 padding: '10px', 
@@ -424,7 +424,7 @@ export function AddRecipe() {
                 whiteSpace: 'nowrap'
               }}
             >
-              添加
+              Add
             </button>
           </div>
           <div>
@@ -457,14 +457,14 @@ export function AddRecipe() {
                     fontSize: '12px'
                   }}
                 >
-                  删除
+                  Delete
                 </button>
               </div>
             ))}
           </div>
         </div>
 
-        {/* 按钮 */}
+        {/* Buttons */}
         <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
           <button
             type="submit"
@@ -482,7 +482,7 @@ export function AddRecipe() {
               opacity: loading ? 0.6 : 1
             }}
           >
-            {loading ? '保存中...' : '保存菜谱'}
+            {loading ? 'Saving...' : 'Save Recipe'}
           </button>
           <button
             type="button"
@@ -501,7 +501,7 @@ export function AddRecipe() {
               opacity: loading ? 0.6 : 1
             }}
           >
-            取消
+            Cancel
           </button>
         </div>
       </form>
