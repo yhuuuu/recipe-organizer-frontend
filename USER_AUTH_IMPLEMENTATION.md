@@ -1,79 +1,79 @@
-# 用户认证功能实现总结
+# User Authentication Feature Implementation Summary
 
-## ✅ 已实现的功能
+## ✅ Implemented Features
 
-### 1. 认证服务 (`src/services/authService.ts`)
-- ✅ 用户注册 `register(username, email, password)`
-- ✅ 用户登录 `login(username, password)`
-- ✅ 登出 `logout()`
-- ✅ 获取 token `getToken()`
-- ✅ 检查登录状态 `isAuthenticated()`
-- ✅ 获取当前用户 `getCurrentUser()`
+### 1. Authentication Service (`src/services/authService.ts`)
+- ✅ User registration `register(username, email, password)`
+- ✅ User login `login(username, password)`
+- ✅ Logout `logout()`
+- ✅ Get token `getToken()`
+- ✅ Check login status `isAuthenticated()`
+- ✅ Get current user `getCurrentUser()`
 
-### 2. API 服务增强
+### 2. Enhanced API Services
 **`src/services/recipesApi.ts`**
-- ✅ 自动添加 Authorization header
-- ✅ 401 错误自动处理（清除 token + 重定向）
-- ✅ 支持搜索和过滤 `fetchRecipes(q?, cuisine?)`
-- ✅ 增强的错误消息解析
+- ✅ Automatically add Authorization header
+- ✅ Automatic 401 error handling (clear token + redirect)
+- ✅ Support search and filter `fetchRecipes(q?, cuisine?)`
+- ✅ Enhanced error message parsing
 
-**`src/services/recipeService.ts`** - 统一服务接口
-- ✅ `getAllRecipes(q?, cuisine?)` - 获取菜谱列表
-- ✅ `getRecipe(id)` - 获取单个菜谱
-- ✅ `createRecipe(recipe)` - 创建菜谱
-- ✅ `updateRecipe(id, recipe)` - 完整更新 (PUT)
-- ✅ `patchRecipe(id, updates)` - 部分更新 (PATCH)
-- ✅ `updateRating(id, rating)` - 更新评分
-- ✅ `toggleWishlist(id, isWishlisted)` - 切换收藏
-- ✅ `deleteRecipe(id)` - 删除菜谱
-- ✅ `extractRecipe(textOrUrl)` - AI 提取
+**`src/services/recipeService.ts`** - Unified service interface
+- ✅ `getAllRecipes(q?, cuisine?)` - Get recipe list
+- ✅ `getRecipe(id)` - Get single recipe
+- ✅ `createRecipe(recipe)` - Create recipe
+- ✅ `updateRecipe(id, recipe)` - Full update (PUT)
+- ✅ `patchRecipe(id, updates)` - Partial update (PATCH)
+- ✅ `updateRating(id, rating)` - Update rating
+- ✅ `toggleWishlist(id, isWishlisted)` - Toggle wishlist
+- ✅ `deleteRecipe(id)` - Delete recipe
+- ✅ `extractRecipe(textOrUrl)` - AI extraction
 
 **`src/services/backendExtractor.ts`**
-- ✅ 自动添加 Authorization header
+- ✅ Automatically add Authorization header
 
-### 3. UI 组件
+### 3. UI Components
 
-**`src/pages/Auth.tsx`** - 登录/注册页面（推荐）
-- ✅ 现代化 UI（shadcn/ui 组件）
-- ✅ 表单验证（用户名≥3字符，密码≥6字符）
-- ✅ 切换登录/注册模式
-- ✅ 错误提示
-- ✅ 加载状态
-- ✅ 自动完成支持
+**`src/pages/Auth.tsx`** - Login/Registration page (recommended)
+- ✅ Modern UI (shadcn/ui components)
+- ✅ Form validation (username ≥ 3 chars, password ≥ 6 chars)
+- ✅ Toggle between login/register modes
+- ✅ Error messages
+- ✅ Loading states
+- ✅ Autocomplete support
 
-**`src/components/Login.tsx`** - 简化版登录组件（备用）
-- ✅ 原生 HTML + 内联样式
-- ✅ 相同的功能逻辑
+**`src/components/Login.tsx`** - Simplified login component (backup)
+- ✅ Native HTML + inline styles
+- ✅ Same functional logic
 
-**`src/components/ProtectedRoute.tsx`** - 路由保护
-- ✅ 未登录自动重定向到 `/auth`
+**`src/components/ProtectedRoute.tsx`** - Route protection
+- ✅ Automatically redirect to `/auth` if not logged in
 
-**`src/components/Navigation.tsx`** - 导航栏
-- ✅ 显示当前用户名
-- ✅ 登出按钮
-- ✅ 未登录显示登录按钮
+**`src/components/Navigation.tsx`** - Navigation bar
+- ✅ Display current username
+- ✅ Logout button
+- ✅ Show login button when not logged in
 
-### 4. 页面更新
+### 4. Page Updates
 
 **`src/pages/Home.tsx`**
-- ✅ 登录检查（未登录重定向）
-- ✅ 显示欢迎信息 "欢迎回来, {username}!"
-- ✅ 集成搜索和过滤功能
+- ✅ Login check (redirect if not logged in)
+- ✅ Display welcome message "Welcome back, {username}!"
+- ✅ Integrated search and filter functionality
 
 **`src/pages/Wishlist.tsx`**
-- ✅ 登录检查
-- ✅ 显示用户名 "{username}'s saved recipes"
+- ✅ Login check
+- ✅ Display username "{username}'s saved recipes"
 
 **`src/pages/RecipeDetail.tsx`**
-- ✅ 登录检查
+- ✅ Login check
 
-**`src/pages/RecipeList.tsx`** - 简化版列表页（备用）
-- ✅ 完整的认证流程
-- ✅ 搜索和过滤
-- ✅ 用户欢迎信息
-- ✅ 登出按钮
+**`src/pages/RecipeList.tsx`** - Simplified list page (backup)
+- ✅ Complete authentication flow
+- ✅ Search and filter
+- ✅ User welcome message
+- ✅ Logout button
 
-### 5. 路由配置 (`src/App.tsx`)
+### 5. Route Configuration (`src/App.tsx`)
 ```typescript
 <Route path="/auth" element={<Auth />} />
 <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
@@ -81,166 +81,166 @@
 <Route path="/wishlist" element={<ProtectedRoute><Wishlist /></ProtectedRoute>} />
 ```
 
-### 6. 状态管理 (`src/store/recipesStore.ts`)
-- ✅ 使用 `recipeService` 替代直接 API 调用
-- ✅ `loadRecipes()` 支持搜索和过滤
-- ✅ `setSelectedCuisine()` 自动重新加载
-- ✅ `setSearchQuery()` 自动重新加载
+### 6. State Management (`src/store/recipesStore.ts`)
+- ✅ Use `recipeService` instead of direct API calls
+- ✅ `loadRecipes()` supports search and filter
+- ✅ `setSelectedCuisine()` automatically reloads
+- ✅ `setSearchQuery()` automatically reloads
 
-## 🔐 安全特性
+## 🔐 Security Features
 
-1. **JWT Token 管理**
-   - Token 存储在 localStorage
-   - 所有 API 请求自动携带 `Authorization: Bearer <token>`
+1. **JWT Token Management**
+   - Token stored in localStorage
+   - All API requests automatically include `Authorization: Bearer <token>`
 
-2. **401 自动处理**
+2. **Automatic 401 Handling**
    ```
-   API 返回 401 → 清除 token → 重定向到 /auth → 抛出错误
+   API returns 401 → Clear token → Redirect to /auth → Throw error
    ```
 
-3. **路由级别保护**
-   - 使用 `ProtectedRoute` 包装需要登录的页面
-   - 未登录自动跳转到登录页
+3. **Route-level Protection**
+   - Use `ProtectedRoute` wrapper for pages requiring login
+   - Automatically redirect to login page if not logged in
 
-4. **页面级别检查**
-   - 每个页面 `useEffect` 中检查 `isAuthenticated()`
-   - 双重保护确保安全性
+4. **Page-level Checks**
+   - Each page checks `isAuthenticated()` in `useEffect`
+   - Dual protection ensures security
 
-## 🎯 使用流程
+## 🎯 Usage Flow
 
-### 用户第一次访问
+### First-time User Visit
 ```
-访问 http://localhost:5173
+Visit http://localhost:5173
     ↓
-未登录，重定向到 /auth
+Not logged in, redirect to /auth
     ↓
-填写注册表单（用户名、邮箱、密码）
+Fill registration form (username, email, password)
     ↓
-提交 → POST /api/auth/register
+Submit → POST /api/auth/register
     ↓
-成功 → 保存 token → 跳转到 /（首页）
-```
-
-### 已登录用户
-```
-访问应用任意页面
-    ↓
-检查 localStorage 中的 token
-    ↓
-有 token → 正常访问
-    ↓
-所有 API 请求自动携带 Authorization header
+Success → Save token → Redirect to / (home)
 ```
 
-### Token 过期
+### Logged-in User
 ```
-API 请求 → 后端返回 401
+Visit any page of the app
     ↓
-前端捕获 401 错误
+Check token in localStorage
     ↓
-清除 localStorage token
+Has token → Access normally
     ↓
-自动重定向到 /auth
-    ↓
-用户重新登录
+All API requests automatically include Authorization header
 ```
 
-## 📊 API 端点要求
+### Token Expiration
+```
+API request → Backend returns 401
+    ↓
+Frontend catches 401 error
+    ↓
+Clear localStorage token
+    ↓
+Automatically redirect to /auth
+    ↓
+User logs in again
+```
 
-确保后端实现以下端点：
+## 📊 Required API Endpoints
 
-### 认证端点（无需 token）
-- `POST /api/auth/register` - 注册
+Ensure backend implements the following endpoints:
+
+### Authentication Endpoints (No token required)
+- `POST /api/auth/register` - Registration
   ```json
   Request: { "username": "...", "email": "...", "password": "..." }
   Response: { "token": "...", "id": "...", "username": "..." }
   ```
 
-- `POST /api/auth/login` - 登录
+- `POST /api/auth/login` - Login
   ```json
   Request: { "username": "...", "password": "..." }
   Response: { "token": "...", "id": "...", "username": "..." }
   ```
 
-### 菜谱端点（需要 token）
-所有请求需要在 header 中包含：
+### Recipe Endpoints (Token required)
+All requests must include in header:
 ```
 Authorization: Bearer <token>
 ```
 
-- `GET /api/recipes?q=&cuisine=` - 获取列表
-- `GET /api/recipes/:id` - 获取详情
-- `POST /api/recipes` - 创建
-- `PUT /api/recipes/:id` - 完整更新
-- `PATCH /api/recipes/:id` - 部分更新
-- `DELETE /api/recipes/:id` - 删除
+- `GET /api/recipes?q=&cuisine=` - Get list
+- `GET /api/recipes/:id` - Get details
+- `POST /api/recipes` - Create
+- `PUT /api/recipes/:id` - Full update
+- `PATCH /api/recipes/:id` - Partial update
+- `DELETE /api/recipes/:id` - Delete
 
-### 提取端点（可选认证）
-- `POST /api/extract` - AI 提取菜谱
+### Extraction Endpoint (Optional authentication)
+- `POST /api/extract` - AI recipe extraction
 
-## 🧪 测试清单
+## 🧪 Testing Checklist
 
-- [ ] 访问 `http://localhost:5173` 自动跳转到 `/auth`
-- [ ] 注册新用户（测试表单验证）
-- [ ] 切换到登录模式（表单清空）
-- [ ] 登录（成功后跳转到首页）
-- [ ] 首页显示 "欢迎回来, {username}!"
-- [ ] 导航栏显示用户名和登出按钮
-- [ ] 搜索菜谱（自动调用 API）
-- [ ] 过滤菜系（自动调用 API）
-- [ ] 添加新菜谱
-- [ ] 编辑菜谱
-- [ ] 删除菜谱
-- [ ] 点击登出按钮（跳转到登录页，token 清除）
-- [ ] 模拟 token 过期（后端返回 401，自动重定向）
+- [ ] Visit `http://localhost:5173` auto-redirects to `/auth`
+- [ ] Register new user (test form validation)
+- [ ] Switch to login mode (form clears)
+- [ ] Login (redirects to home after success)
+- [ ] Home page displays "Welcome back, {username}!"
+- [ ] Navigation bar shows username and logout button
+- [ ] Search recipes (automatically calls API)
+- [ ] Filter cuisines (automatically calls API)
+- [ ] Add new recipe
+- [ ] Edit recipe
+- [ ] Delete recipe
+- [ ] Click logout button (redirects to login page, token cleared)
+- [ ] Simulate token expiration (backend returns 401, auto-redirect)
 
-## 🎨 组件选择建议
+## 🎨 Component Selection Recommendations
 
-### 推荐配置（现代化 UI）
+### Recommended Configuration (Modern UI)
 ```
-使用 src/pages/Auth.tsx + src/pages/Home.tsx
+Use src/pages/Auth.tsx + src/pages/Home.tsx
 ```
-- ✅ shadcn/ui 组件
-- ✅ TailwindCSS 样式
-- ✅ 动画效果
-- ✅ 响应式设计
-- ✅ 完整的无障碍访问
+- ✅ shadcn/ui components
+- ✅ TailwindCSS styles
+- ✅ Animation effects
+- ✅ Responsive design
+- ✅ Full accessibility
 
-### 简化配置（原生样式）
+### Simplified Configuration (Native styles)
 ```
-使用 src/components/Login.tsx + src/pages/RecipeList.tsx
+Use src/components/Login.tsx + src/pages/RecipeList.tsx
 ```
-- ✅ 原生 HTML + 内联样式
-- ✅ 更简单直接
-- ✅ 容易定制
+- ✅ Native HTML + inline styles
+- ✅ Simpler and more direct
+- ✅ Easy to customize
 
-## 📝 环境变量
+## 📝 Environment Variables
 
-确保 `.env` 文件配置正确：
+Ensure `.env` file is configured correctly:
 ```bash
 VITE_API_BASE_URL=http://localhost:4000/api
 ```
 
-## 🚀 启动应用
+## 🚀 Starting the Application
 
 ```bash
-# 前端
+# Frontend
 npm run dev
 
-# 后端（确保运行在 4000 端口）
+# Backend (ensure running on port 4000)
 cd ../recipe-organizer-backend
 npm run dev
 ```
 
-## 🎉 完成！
+## 🎉 Complete!
 
-现在你的应用已经完全支持：
-- ✅ 用户注册和登录
-- ✅ JWT Token 认证
-- ✅ 自动 token 管理
-- ✅ 401 错误处理
-- ✅ 路由保护
-- ✅ 搜索和过滤
-- ✅ 用户个性化体验
+Your app now fully supports:
+- ✅ User registration and login
+- ✅ JWT Token authentication
+- ✅ Automatic token management
+- ✅ 401 error handling
+- ✅ Route protection
+- ✅ Search and filter
+- ✅ Personalized user experience
 
-所有功能都已集成到现有的应用中，无需额外配置！
+All features are integrated into the existing app, no additional configuration needed!

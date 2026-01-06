@@ -1,156 +1,156 @@
-# 路由配置完整指南
+# Complete Routing Configuration Guide
 
-## 📍 所有可用路由
+## 📍 All Available Routes
 
-### **公开路由（无需登录）**
+### **Public Routes (No Login Required)**
 
-| 路径 | 组件 | 说明 |
+| Path | Component | Description |
 |------|------|------|
-| `/auth` | `Auth.tsx` | 登录/注册页面（推荐） |
-| `/login` | `Auth.tsx` | 登录页面（兼容路径） |
+| `/auth` | `Auth.tsx` | Login/Registration page (recommended) |
+| `/login` | `Auth.tsx` | Login page (compatibility path) |
 
-### **受保护路由（需要登录）**
+### **Protected Routes (Login Required)**
 
-| 路径 | 组件 | 说明 |
+| Path | Component | Description |
 |------|------|------|
-| `/` | `Home.tsx` | 主页 - 菜谱网格视图（推荐）⭐ |
-| `/recipe/:id` | `RecipeDetail.tsx` | 菜谱详情页 |
-| `/wishlist` | `Wishlist.tsx` | 收藏夹 |
-| `/add-recipe` | `AddRecipe.tsx` | 添加菜谱（独立页面） |
-| `/edit-recipe/:id` | `EditRecipe.tsx` | 编辑菜谱（独立页面） |
-| `/list` | `RecipeList.tsx` | 菜谱列表（简化版） |
+| `/` | `Home.tsx` | Home - Recipe grid view (recommended) ⭐ |
+| `/recipe/:id` | `RecipeDetail.tsx` | Recipe detail page |
+| `/wishlist` | `Wishlist.tsx` | Favorites/Wishlist |
+| `/add-recipe` | `AddRecipe.tsx` | Add recipe (standalone page) |
+| `/edit-recipe/:id` | `EditRecipe.tsx` | Edit recipe (standalone page) |
+| `/list` | `RecipeList.tsx` | Recipe list (simplified version) |
 
-### **特殊路由**
+### **Special Routes**
 
-| 路径 | 行为 |
+| Path | Behavior |
 |------|------|
-| `*`（任意未匹配） | 重定向到 `/` |
+| `*` (any unmatched) | Redirect to `/` |
 
-## 🔐 认证流程
+## 🔐 Authentication Flow
 
-### **访问受保护路由时**
+### **When Accessing Protected Routes**
 ```
-用户访问 /
+User visits /
     ↓
-检查 authService.isAuthenticated()
+Check authService.isAuthenticated()
     ↓
-未登录 → Navigate to /auth
+Not logged in → Navigate to /auth
     ↓
-已登录 → 显示页面
+Logged in → Display page
 ```
 
-### **登录后跳转**
+### **After Login Redirect**
 ```
-用户在 /auth 登录成功
+User successfully logs in at /auth
     ↓
 navigate('/') 
     ↓
-跳转到主页
+Redirect to home page
 ```
 
-## 🎨 使用示例
+## 🎨 Usage Examples
 
-### **在代码中导航**
+### **Navigation in Code**
 
 ```typescript
 import { useNavigate } from 'react-router-dom';
 
 const navigate = useNavigate();
 
-// 跳转到登录页
+// Navigate to login page
 navigate('/auth');
 
-// 跳转到主页
+// Navigate to home
 navigate('/');
 
-// 查看菜谱详情
+// View recipe details
 navigate(`/recipe/${recipeId}`);
 
-// 添加新菜谱（独立页面）
+// Add new recipe (standalone page)
 navigate('/add-recipe');
 
-// 编辑菜谱（独立页面）
+// Edit recipe (standalone page)
 navigate(`/edit-recipe/${recipeId}`);
 
-// 收藏夹
+// Wishlist
 navigate('/wishlist');
 
-// 简化版列表
+// Simplified list view
 navigate('/list');
 ```
 
-### **在链接中使用**
+### **Using Links**
 
 ```tsx
 import { Link } from 'react-router-dom';
 
-<Link to="/">首页</Link>
-<Link to="/wishlist">收藏夹</Link>
-<Link to="/add-recipe">添加菜谱</Link>
-<Link to={`/recipe/${id}`}>查看详情</Link>
+<Link to="/">Home</Link>
+<Link to="/wishlist">Wishlist</Link>
+<Link to="/add-recipe">Add Recipe</Link>
+<Link to={`/recipe/${id}`}>View Details</Link>
 ```
 
-## 📊 路由配置对比
+## 📊 Routing Configuration Comparison
 
-### **选项 1：使用模态框（当前推荐）⭐**
+### **Option 1: Using Modal (Currently Recommended) ⭐**
 
 ```typescript
-// 路由配置
+// Route configuration
 <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
 
-// 在 Home.tsx 中
+// In Home.tsx
 const [isModalOpen, setIsModalOpen] = useState(false);
 
-// 打开模态框添加菜谱
+// Open modal to add recipe
 <Button onClick={() => setIsModalOpen(true)}>Add Recipe</Button>
 
-// 模态框组件
+// Modal component
 <AddRecipeModal open={isModalOpen} onOpenChange={setIsModalOpen} />
 ```
 
-**优点：**
-- ✅ 更流畅的用户体验
-- ✅ 无需页面切换
-- ✅ 现代化 UI
-- ✅ 动画效果
-- ✅ 支持图片上传和相机
+**Advantages:**
+- ✅ Smoother user experience
+- ✅ No page switching required
+- ✅ Modern UI
+- ✅ Animation effects
+- ✅ Supports image upload and camera
 
-### **选项 2：使用独立页面**
+### **Option 2: Using Standalone Pages**
 
 ```typescript
-// 路由配置
+// Route configuration
 <Route path="/add-recipe" element={<ProtectedRoute><AddRecipe /></ProtectedRoute>} />
 
-// 在任意组件中
+// In any component
 <Button onClick={() => navigate('/add-recipe')}>Add Recipe</Button>
 ```
 
-**优点：**
-- ✅ 完整的页面布局
-- ✅ 更容易定制样式
-- ✅ 适合复杂表单
-- ✅ SEO 友好（如果需要）
+**Advantages:**
+- ✅ Full page layout
+- ✅ Easier to customize styles
+- ✅ Suitable for complex forms
+- ✅ SEO friendly (if needed)
 
-## 🚀 推荐路由策略
+## 🚀 Recommended Routing Strategy
 
-### **主要功能使用模态框**
-- ✅ 添加菜谱：`AddRecipeModal` (在 Home 页面)
-- ✅ 编辑菜谱：`EditRecipeModal` (在 Home 页面)
-- ✅ 主页：`Home.tsx` (网格视图)
+### **Main Features Using Modals**
+- ✅ Add recipe: `AddRecipeModal` (on Home page)
+- ✅ Edit recipe: `EditRecipeModal` (on Home page)
+- ✅ Home page: `Home.tsx` (grid view)
 
-### **辅助功能使用独立路由**
-- ✅ 菜谱详情：`/recipe/:id`
-- ✅ 收藏夹：`/wishlist`
-- ✅ 登录页：`/auth`
+### **Auxiliary Features Using Standalone Routes**
+- ✅ Recipe details: `/recipe/:id`
+- ✅ Wishlist: `/wishlist`
+- ✅ Login page: `/auth`
 
-### **备用选项（可选启用）**
-- ⚠️ 独立添加页面：`/add-recipe`
-- ⚠️ 独立编辑页面：`/edit-recipe/:id`
-- ⚠️ 简化列表页面：`/list`
+### **Alternative Options (Optional)**
+- ⚠️ Standalone add page: `/add-recipe`
+- ⚠️ Standalone edit page: `/edit-recipe/:id`
+- ⚠️ Simplified list page: `/list`
 
-## 🔍 路由调试
+## 🔍 Route Debugging
 
-### **检查当前路由**
+### **Check Current Route**
 ```tsx
 import { useLocation } from 'react-router-dom';
 
@@ -162,7 +162,7 @@ function MyComponent() {
 }
 ```
 
-### **检查路由参数**
+### **Check Route Parameters**
 ```tsx
 import { useParams } from 'react-router-dom';
 
@@ -172,38 +172,38 @@ function RecipeDetail() {
 }
 ```
 
-### **检查导航历史**
+### **Check Navigation History**
 ```tsx
 import { useNavigate } from 'react-router-dom';
 
 const navigate = useNavigate();
 
-// 返回上一页
+// Go back
 navigate(-1);
 
-// 前进
+// Go forward
 navigate(1);
 
-// 替换当前历史记录（不会添加新记录）
+// Replace current history entry (won't add new record)
 navigate('/auth', { replace: true });
 ```
 
-## 🛡️ ProtectedRoute 工作原理
+## 🛡️ How ProtectedRoute Works
 
 ```typescript
 // src/components/ProtectedRoute.tsx
 export function ProtectedRoute({ children }) {
   if (!authService.isAuthenticated()) {
-    // 未登录，重定向到登录页
+    // Not logged in, redirect to login page
     return <Navigate to="/auth" replace />;
   }
   
-  // 已登录，渲染子组件
+  // Logged in, render children
   return <>{children}</>;
 }
 ```
 
-**使用场景：**
+**Usage:**
 ```tsx
 <Route 
   path="/protected" 
@@ -215,12 +215,12 @@ export function ProtectedRoute({ children }) {
 />
 ```
 
-## 📱 响应式导航
+## 📱 Responsive Navigation
 
-### **Navigation 组件**
+### **Navigation Component**
 ```tsx
 // src/components/Navigation.tsx
-// 根据当前路径高亮导航项
+// Highlight navigation item based on current path
 const location = useLocation();
 
 <Button variant={location.pathname === '/' ? 'default' : 'ghost'}>
@@ -228,9 +228,9 @@ const location = useLocation();
 </Button>
 ```
 
-## 🎯 最佳实践
+## 🎯 Best Practices
 
-### **1. 使用常量定义路径**
+### **1. Use Constants for Paths**
 ```typescript
 // src/constants/routes.ts
 export const ROUTES = {
@@ -242,11 +242,11 @@ export const ROUTES = {
   EDIT_RECIPE: '/edit-recipe/:id',
 } as const;
 
-// 使用
+// Usage
 navigate(ROUTES.HOME);
 ```
 
-### **2. 创建导航辅助函数**
+### **2. Create Navigation Helper Functions**
 ```typescript
 // src/utils/navigation.ts
 export const navigateToRecipe = (navigate: NavigateFunction, id: string) => {
@@ -258,33 +258,33 @@ export const navigateToEditRecipe = (navigate: NavigateFunction, id: string) => 
 };
 ```
 
-### **3. 使用 URL 参数传递状态**
+### **3. Pass State via URL Parameters**
 ```typescript
-// 带查询参数的导航
+// Navigation with query parameters
 navigate('/recipes?cuisine=Chinese&rating=5');
 
-// 获取查询参数
+// Get query parameters
 const [searchParams] = useSearchParams();
 const cuisine = searchParams.get('cuisine');
 const rating = searchParams.get('rating');
 ```
 
-## 🧪 测试路由
+## 🧪 Testing Routes
 
-### **测试清单**
+### **Testing Checklist**
 
-- [ ] 未登录访问 `/` → 重定向到 `/auth`
-- [ ] 未登录访问 `/wishlist` → 重定向到 `/auth`
-- [ ] 未登录访问 `/recipe/123` → 重定向到 `/auth`
-- [ ] 登录后访问 `/` → 显示主页
-- [ ] 登录后访问 `/auth` → 可以访问（已登录用户可以查看登录页）
-- [ ] 访问不存在的路径 `/xyz` → 重定向到 `/`
-- [ ] `/login` 和 `/auth` 都可以访问登录页
-- [ ] 独立页面路由正常工作：`/add-recipe`, `/edit-recipe/123`, `/list`
+- [ ] Access `/` without login → Redirect to `/auth`
+- [ ] Access `/wishlist` without login → Redirect to `/auth`
+- [ ] Access `/recipe/123` without login → Redirect to `/auth`
+- [ ] Access `/` after login → Display home page
+- [ ] Access `/auth` after login → Can access (logged-in users can view login page)
+- [ ] Access non-existent path `/xyz` → Redirect to `/`
+- [ ] Both `/login` and `/auth` access login page
+- [ ] Standalone page routes work: `/add-recipe`, `/edit-recipe/123`, `/list`
 
-## 🎨 自定义路由布局
+## 🎨 Custom Route Layouts
 
-### **不同路由使用不同布局**
+### **Different Layouts for Different Routes**
 
 ```tsx
 // App.tsx
@@ -292,10 +292,10 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* 无导航栏的路由 */}
+        {/* Routes without navigation bar */}
         <Route path="/auth" element={<Auth />} />
         
-        {/* 有导航栏的路由 */}
+        {/* Routes with navigation bar */}
         <Route element={<LayoutWithNav />}>
           <Route path="/" element={<Home />} />
           <Route path="/wishlist" element={<Wishlist />} />
@@ -310,20 +310,20 @@ function LayoutWithNav() {
   return (
     <>
       <Navigation />
-      <Outlet /> {/* 渲染子路由 */}
+      <Outlet /> {/* Render child routes */}
     </>
   );
 }
 ```
 
-## 📝 总结
+## 📝 Summary
 
-当前路由配置提供了灵活的选项：
+Current routing configuration provides flexible options:
 
-1. **主要使用路径**：`/`, `/auth`, `/recipe/:id`, `/wishlist`
-2. **备用页面路径**：`/add-recipe`, `/edit-recipe/:id`, `/list`
-3. **兼容路径**：`/login` → `/auth`
-4. **所有路由都有认证保护**（除了 `/auth` 和 `/login`）
-5. **未匹配路径自动重定向到首页**
+1. **Primary paths**: `/`, `/auth`, `/recipe/:id`, `/wishlist`
+2. **Alternative page paths**: `/add-recipe`, `/edit-recipe/:id`, `/list`
+3. **Compatibility path**: `/login` → `/auth`
+4. **All routes have authentication protection** (except `/auth` and `/login`)
+5. **Unmatched paths automatically redirect to home**
 
-推荐使用现有的模态框实现（Home 页面），备用的独立页面作为可选方案！🎉
+Recommended to use existing modal implementation (Home page), with standalone pages as optional alternatives! 🎉

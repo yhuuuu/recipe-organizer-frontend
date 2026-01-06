@@ -49,7 +49,7 @@ export function Home() {
             <h1 className="text-4xl font-bold">My Recipes</h1>
             {user.username && (
               <p className="text-muted-foreground mt-1">
-                欢迎回来, <span className="font-medium text-foreground">{user.username}</span>!
+                Welcome back, <span className="font-medium text-foreground">{user.username}</span>!
               </p>
             )}
           </div>
