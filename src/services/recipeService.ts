@@ -10,13 +10,9 @@ import {
   createRecipe as apiCreateRecipe,
   updateRecipe as apiUpdateRecipe,
   replaceRecipe,
-  updateRecipeRating as apiUpdateRating,
-  toggleWishlist as apiToggleWishlist,
   deleteRecipe as apiDeleteRecipe
 } from './recipesApi';
 import { extractRecipeFromBackend } from './backendExtractor';
-
-const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000/api';
 
 export const recipeService = {
   /**
