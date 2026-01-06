@@ -1,18 +1,50 @@
 import { Recipe } from '@/types/Recipe';
+import { authService } from './authService';
 
 const BASE = (import.meta.env.VITE_API_BASE_URL as string) || 'http://localhost:4000/api';
 
+// 获取认证请求头
+const getAuthHeaders = (): Record<string, string> => {
+  const token = authService.getToken();
+  return {
+    'Content-Type': 'application/json',
+    ...(token && { 'Authorization': `Bearer ${token}` })
+  };
+};
+
+// 处理 401 未授权错误
+const handle401 = () => {
+  authService.logout();
+  window.location.href = '/auth';
+  throw new Error('Session expired');
+};
+
 async function apiFetch<T = any>(path: string, opts: RequestInit = {}): Promise<T> {
   const url = `${BASE}${path}`;
+  
   try {
     const res = await fetch(url, {
-      headers: { 'Content-Type': 'application/json', ...(opts.headers || {}) },
       ...opts,
+      headers: getAuthHeaders(),
     });
+
+    // 处理 401 未授权
+    if (res.status === 401) {
+      handle401();
+    }
 
     if (!res.ok) {
       const text = await res.text().catch(() => '');
-      throw new Error(`Request failed ${res.status} ${res.statusText}: ${text}`);
+      let errorMessage = `Request failed ${res.status} ${res.statusText}`;
+      
+      try {
+        const errorJson = JSON.parse(text);
+        errorMessage = errorJson.error || errorJson.errors?.[0]?.msg || errorMessage;
+      } catch {
+        if (text) errorMessage += `: ${text}`;
+      }
+      
+      throw new Error(errorMessage);
     }
 
     // No content
@@ -26,9 +58,17 @@ async function apiFetch<T = any>(path: string, opts: RequestInit = {}): Promise<
   }
 }
 
-export async function fetchRecipes(): Promise<Recipe[]> {
+// 获取所有菜谱（支持搜索和过滤）
+export async function fetchRecipes(q?: string, cuisine?: string): Promise<Recipe[]> {
   try {
-    const recipes = await apiFetch<any[]>('/recipes');
+    const params = new URLSearchParams();
+    if (q) params.append('q', q);
+    if (cuisine && cuisine !== 'All') params.append('cuisine', cuisine);
+    
+    const queryString = params.toString();
+    const path = queryString ? `/recipes?${queryString}` : '/recipes';
+    
+    const recipes = await apiFetch<any[]>(path);
     // Map MongoDB _id to id for frontend compatibility
     return recipes.map(recipe => ({
       ...recipe,
@@ -40,6 +80,7 @@ export async function fetchRecipes(): Promise<Recipe[]> {
   }
 }
 
+// 获取单个菜谱
 export async function fetchRecipeById(id: string): Promise<Recipe | null> {
   try {
     const recipe = await apiFetch<any>(`/recipes/${id}`);
@@ -54,9 +95,13 @@ export async function fetchRecipeById(id: string): Promise<Recipe | null> {
   }
 }
 
+// 创建新菜谱
 export async function createRecipe(recipe: Omit<Recipe, 'id' | 'createdAt'>): Promise<Recipe> {
   try {
-    const createdRecipe = await apiFetch<any>('/recipes', { method: 'POST', body: JSON.stringify(recipe) });
+    const createdRecipe = await apiFetch<any>('/recipes', { 
+      method: 'POST', 
+      body: JSON.stringify(recipe) 
+    });
     // Map MongoDB _id to id for frontend compatibility
     return {
       ...createdRecipe,
@@ -68,9 +113,31 @@ export async function createRecipe(recipe: Omit<Recipe, 'id' | 'createdAt'>): Pr
   }
 }
 
+// 完整更新菜谱 (PUT)
+export async function replaceRecipe(id: string, recipe: Omit<Recipe, 'id' | 'createdAt'>): Promise<Recipe> {
+  try {
+    const updatedRecipe = await apiFetch<any>(`/recipes/${id}`, { 
+      method: 'PUT', 
+      body: JSON.stringify(recipe) 
+    });
+    // Map MongoDB _id to id for frontend compatibility
+    return {
+      ...updatedRecipe,
+      id: updatedRecipe._id || updatedRecipe.id,
+    };
+  } catch (err) {
+    console.error('Error replacing recipe:', err);
+    throw err;
+  }
+}
+
+// 部分更新菜谱 (PATCH)
 export async function updateRecipe(id: string, updates: Partial<Recipe>): Promise<Recipe> {
   try {
-    const updatedRecipe = await apiFetch<any>(`/recipes/${id}`, { method: 'PATCH', body: JSON.stringify(updates) });
+    const updatedRecipe = await apiFetch<any>(`/recipes/${id}`, { 
+      method: 'PATCH', 
+      body: JSON.stringify(updates) 
+    });
     // Map MongoDB _id to id for frontend compatibility
     return {
       ...updatedRecipe,

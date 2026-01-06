@@ -1,16 +1,26 @@
 import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Heart } from 'lucide-react';
 import { useRecipesStore } from '@/store/recipesStore';
+import { authService } from '@/services/authService';
 import { RecipeCard } from '@/components/RecipeCard';
 
 export function Wishlist() {
+  const navigate = useNavigate();
   const { loadRecipes, getWishlistedRecipes } = useRecipesStore();
   const wishlistedRecipes = getWishlistedRecipes();
+  const user = authService.getCurrentUser();
 
   useEffect(() => {
+    // 检查是否已登录
+    if (!authService.isAuthenticated()) {
+      navigate('/auth');
+      return;
+    }
+    
     loadRecipes();
-  }, [loadRecipes]);
+  }, [loadRecipes, navigate]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -25,6 +35,7 @@ export function Wishlist() {
             <h1 className="text-4xl font-bold">My Wishlist</h1>
           </div>
           <p className="text-muted-foreground">
+            {user.username && <span className="font-medium">{user.username}'s </span>}
             {wishlistedRecipes.length} saved recipe{wishlistedRecipes.length !== 1 ? 's' : ''}
           </p>
         </motion.div>

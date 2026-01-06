@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Heart, ExternalLink, Edit, Trash2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useRecipesStore } from '@/store/recipesStore';
+import { authService } from '@/services/authService';
 import { RatingStars } from '@/components/RatingStars';
 import { EditRecipeModal } from '@/components/EditRecipeModal';
 import { Button } from '@/components/ui/button';
@@ -20,6 +21,12 @@ export function RecipeDetail() {
   const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
+    // 检查是否已登录
+    if (!authService.isAuthenticated()) {
+      navigate('/auth');
+      return;
+    }
+
     const loadRecipe = async () => {
       if (!id) return;
 
