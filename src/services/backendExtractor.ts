@@ -5,6 +5,7 @@
 
 import { ExtractedRecipe } from '@/types/Recipe';
 import { parseCuisine } from '@/utils/parseCuisine';
+import { authService } from './authService';
 
 const BASE = (import.meta.env.VITE_API_BASE_URL as string) || 'http://localhost:4000/api';
 
@@ -27,12 +28,20 @@ export async function extractRecipeFromBackend(
   
   console.log('Request data:', url ? { url } : { text: text.substring(0, 200) + '...' });
   
+  // 获取 token
+  const token = authService.getToken();
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+  
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+  
   try {
     const response = await fetch(`${BASE}/extract`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers,
       body: JSON.stringify(requestBody),
     });
 

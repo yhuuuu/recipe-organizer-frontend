@@ -1,13 +1,6 @@
 import { create } from 'zustand';
 import { Recipe, Cuisine } from '@/types/Recipe';
-import {
-  fetchRecipes,
-  createRecipe,
-  updateRecipeRating,
-  toggleWishlist,
-  updateRecipe,
-  deleteRecipe,
-} from '@/services/recipesApi';
+import { recipeService } from '@/services/recipeService';
 
 interface RecipesState {
   recipes: Recipe[];
@@ -35,7 +28,12 @@ export const useRecipesStore = create<RecipesState>((set, get) => ({
   loadRecipes: async () => {
     set({ isLoading: true });
     try {
-      const recipes = await fetchRecipes();
+      const { searchQuery, selectedCuisine } = get();
+      // 使用 recipeService 支持搜索和过滤
+      const recipes = await recipeService.getAllRecipes(
+        searchQuery || undefined,
+        selectedCuisine !== 'All' ? selectedCuisine : undefined
+      );
       set({ recipes, isLoading: false });
     } catch (error) {
       console.error('Error loading recipes:', error);
@@ -45,7 +43,7 @@ export const useRecipesStore = create<RecipesState>((set, get) => ({
 
   addRecipe: async (recipe) => {
     try {
-      const newRecipe = await createRecipe(recipe);
+      const newRecipe = await recipeService.createRecipe(recipe);
       set((state) => ({
         recipes: [newRecipe, ...state.recipes],
       }));
@@ -57,7 +55,7 @@ export const useRecipesStore = create<RecipesState>((set, get) => ({
 
   editRecipe: async (id, updates) => {
     try {
-      const updatedRecipe = await updateRecipe(id, updates as Partial<Recipe>);
+      const updatedRecipe = await recipeService.patchRecipe(id, updates as Partial<Recipe>);
       set((state) => ({
         recipes: state.recipes.map((r) =>
           r.id === id ? updatedRecipe : r
@@ -71,7 +69,7 @@ export const useRecipesStore = create<RecipesState>((set, get) => ({
 
   deleteRecipeById: async (id) => {
     try {
-      await deleteRecipe(id);
+      await recipeService.deleteRecipe(id);
       set((state) => ({
         recipes: state.recipes.filter((r) => r.id !== id),
       }));
@@ -91,7 +89,7 @@ export const useRecipesStore = create<RecipesState>((set, get) => ({
 
     // Try to update via API
     try {
-      const updatedRecipe = await updateRecipeRating(id, rating);
+      const updatedRecipe = await recipeService.updateRating(id, rating);
       set((state) => ({
         recipes: state.recipes.map((r) =>
           r.id === id ? updatedRecipe : r
@@ -118,7 +116,7 @@ export const useRecipesStore = create<RecipesState>((set, get) => ({
 
     // Try to update via API
     try {
-      const updatedRecipe = await toggleWishlist(id, newWishlistStatus);
+      const updatedRecipe = await recipeService.toggleWishlist(id, newWishlistStatus);
       set((state) => ({
         recipes: state.recipes.map((r) =>
           r.id === id ? updatedRecipe : r
@@ -132,10 +130,14 @@ export const useRecipesStore = create<RecipesState>((set, get) => ({
 
   setSelectedCuisine: (cuisine) => {
     set({ selectedCuisine: cuisine });
+    // 重新加载菜谱以应用过滤
+    get().loadRecipes();
   },
 
   setSearchQuery: (query) => {
     set({ searchQuery: query });
+    // 重新加载菜谱以应用搜索
+    get().loadRecipes();
   },
 
   getFilteredRecipes: () => {

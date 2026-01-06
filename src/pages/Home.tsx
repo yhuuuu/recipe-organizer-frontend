@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Plus, Search } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useRecipesStore } from '@/store/recipesStore';
+import { authService } from '@/services/authService';
 import { RecipeCard } from '@/components/RecipeCard';
 import { FilterBar } from '@/components/FilterBar';
 import { AddRecipeModal } from '@/components/AddRecipeModal';
@@ -11,15 +13,23 @@ import { Input } from '@/components/ui/input';
 import { Recipe } from '@/types/Recipe';
 
 export function Home() {
+  const navigate = useNavigate();
   const { loadRecipes, getFilteredRecipes, setSearchQuery, searchQuery, isLoading } = useRecipesStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const recipes = getFilteredRecipes();
+  const user = authService.getCurrentUser();
 
   useEffect(() => {
+    // 检查是否已登录
+    if (!authService.isAuthenticated()) {
+      navigate('/auth');
+      return;
+    }
+    
     loadRecipes();
-  }, [loadRecipes]);
+  }, [loadRecipes, navigate]);
 
   const handleEditClick = (recipe: Recipe) => {
     setSelectedRecipe(recipe);
@@ -29,13 +39,20 @@ export function Home() {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
-        {/* Header */}
+        {/* Header with User Welcome */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4"
         >
-          <h1 className="text-4xl font-bold">My Recipes</h1>
+          <div>
+            <h1 className="text-4xl font-bold">My Recipes</h1>
+            {user.username && (
+              <p className="text-muted-foreground mt-1">
+                欢迎回来, <span className="font-medium text-foreground">{user.username}</span>!
+              </p>
+            )}
+          </div>
           <Button onClick={() => setIsModalOpen(true)} size="lg">
             <Plus className="w-5 h-5 mr-2" />
             Add Recipe
