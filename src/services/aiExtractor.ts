@@ -1,15 +1,9 @@
 import { ExtractedRecipe } from '@/types/Recipe';
 import { parseCuisine } from '@/utils/parseCuisine';
-import {
-  detectVideoPlatform,
-  fetchVideoMetadata,
-  fetchVideoCaptions,
-  VideoPlatform,
-} from './videoExtractor';
 
 /**
  * Extracts recipe information from a URL using AI
- * Supports both regular web pages and video platforms (YouTube, Bilibili, Instagram, Xiaohongshu)
+ * Supports web pages and direct text content
  */
 export async function extractRecipeFromUrl(url: string): Promise<ExtractedRecipe> {
   try {
@@ -19,46 +13,12 @@ export async function extractRecipeFromUrl(url: string): Promise<ExtractedRecipe
       return await extractRecipeWithAI(textContent, '', '');
     }
     
-    const platform = detectVideoPlatform(url);
-    
-    // Handle video URLs
-    if (platform !== 'unknown') {
-      return await extractFromVideo(url, platform);
-    }
-    
     // Handle regular web pages
     return await extractFromWebPage(url);
   } catch (error) {
     console.error('Error extracting recipe:', error);
     throw error;
   }
-}
-
-/**
- * Extracts recipe from video platforms
- */
-async function extractFromVideo(
-  url: string,
-  platform: VideoPlatform
-): Promise<ExtractedRecipe> {
-  console.log(`Detected ${platform} video, extracting metadata...`);
-  
-  // Fetch video metadata (title, description, thumbnail)
-  const metadata = await fetchVideoMetadata(url);
-  
-  if (!metadata) {
-    throw new Error('Failed to fetch video metadata');
-  }
-
-  // Fetch video captions/subtitles (requires backend)
-  // In production, this would call your backend API
-  const captions = await fetchVideoCaptions(platform, metadata.videoId);
-  
-  // Combine description and captions for AI analysis
-  const videoContent = `${metadata.title}\n\n${metadata.description}\n\n${captions}`;
-  
-  // Use AI to extract recipe from video content
-  return await extractRecipeWithAI(videoContent, metadata.thumbnail, url);
 }
 
 /**

@@ -94,7 +94,7 @@ src/
 │   ├── recipesApi.ts
 │   ├── aiExtractor.ts
 │   ├── textExtractor.ts
-│   └── videoExtractor.ts
+│   └── backendExtractor.ts
 ├── types/              # TypeScript type definitions
 │   └── Recipe.ts
 ├── utils/              # Utility functions
@@ -110,19 +110,12 @@ src/
 ### Adding a Recipe
 
 1. Click the "Add Recipe" button
-2. Paste a URL from:
-   - Any website
-   - **YouTube videos** (自动提取视频描述和字幕)
-   - **Bilibili videos** (支持B站视频)
-   - **Instagram posts/reels** (支持Instagram内容)
-   - **Xiaohongshu (小红书) posts** (支持小红书内容)
+2. Paste a recipe URL from any website
 3. Click "Extract with AI" to automatically extract recipe information
 4. Review and edit the extracted data if needed
 5. Click "Save Recipe"
 
 Alternatively, you can manually enter recipe details by clicking "Enter Manually".
-
-**Note**: For full video support (including subtitle extraction), you'll need to set up a backend API. See `BACKEND_API_EXAMPLE.md` for details.
 
 ### Viewing Recipes
 
@@ -145,37 +138,24 @@ Alternatively, you can manually enter recipe details by clicking "Enter Manually
 
 ## AI Extraction
 
-The app includes AI extraction that supports both web pages and video platforms.
+The app includes AI-powered extraction for recipe websites.
 
-### Video Support
+### How It Works
 
-The app can detect and extract recipes from:
-- **YouTube** - Extracts video title, description, and captions
-- **Bilibili** - Extracts video metadata
-- **Instagram** - Extracts post content
-- **Xiaohongshu (小红书)** - Extracts post content
+1. Paste a recipe URL from any website
+2. The backend fetches the page content
+3. AI analyzes the content and extracts:
+   - Recipe title
+   - Ingredients list
+   - Cooking steps
+   - Cuisine type
+   - Recipe image
 
-### Setup Options
+### Setup (Optional)
 
-1. **Option 1: OpenAI (Recommended for Video)**
-   - Add your OpenAI API key to `.env`: `VITE_OPENAI_API_KEY=your-key`
-   - The app will automatically use OpenAI to analyze video descriptions and captions
-   - Works best for extracting detailed recipe information from video content
-
-2. **Option 2: Backend API (Full Video Support)**
-   - Set up a backend API to fetch video metadata and captions
-   - See `BACKEND_API_EXAMPLE.md` for complete implementation guide
-   - Required for extracting video subtitles (YouTube, Bilibili, etc.)
-
-3. **Option 3: Local LLM**
-   - Use a local LLM like Ollama
-   - Update the extraction function to call your local API
-
-**Current Status**: 
-- ✅ Video platform detection works
-- ✅ Basic video metadata extraction works
-- ⚠️ Full subtitle extraction requires backend API (see `BACKEND_API_EXAMPLE.md`)
-- ✅ AI analysis works if OpenAI API key is configured
+For enhanced AI extraction, you can configure an OpenAI API key:
+- Add to `.env`: `VITE_OPENAI_API_KEY=your-key`
+- This enables more accurate recipe parsing from complex web pages
 
 ## Mock Data
 
