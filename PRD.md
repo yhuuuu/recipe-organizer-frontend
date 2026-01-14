@@ -31,8 +31,8 @@ As a user, I can paste a URL from any website, Instagram, or Xiaohongshu.
 
 The system will auto-extract:
 
-- Recipe name
-- Image(s)
+- Recipe name (if detectable)
+- Image(s) (if detectable)
 - Ingredients list
 - Steps
 - Cuisine type (if detectable)

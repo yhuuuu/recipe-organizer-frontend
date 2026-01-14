@@ -1,6 +1,6 @@
 /**
- * Recipe Service - 统一的菜谱服务接口
- * 包含所有菜谱相关的 CRUD 操作和认证处理
+ * Recipe Service - Unified recipe service interface
+ * Includes all recipe-related CRUD operations and authentication handling
  */
 
 import { Recipe } from '@/types/Recipe';
@@ -16,98 +16,98 @@ import { extractRecipeFromBackend } from './backendExtractor';
 
 export const recipeService = {
   /**
-   * 获取所有菜谱（支持搜索和过滤）
-   * @param q - 搜索关键词
-   * @param cuisine - 菜系过滤（如 'Chinese', 'Italian', 'All'）
-   * @returns 菜谱列表
+   * Get all recipes (supports search and filtering)
+   * @param q - Search keyword
+   * @param cuisine - Cuisine filter (e.g., 'Chinese', 'Italian', 'All')
+   * @returns List of recipes
    */
   getAllRecipes: async (q?: string, cuisine?: string): Promise<Recipe[]> => {
     return fetchRecipes(q, cuisine);
   },
 
   /**
-   * 获取单个菜谱详情
-   * @param id - 菜谱 ID
-   * @returns 菜谱详情或 null
+   * Get a single recipe
+   * @param id - Recipe ID
+   * @returns Recipe details or null
    */
   getRecipe: async (id: string): Promise<Recipe | null> => {
     return fetchRecipeById(id);
   },
 
   /**
-   * 创建新菜谱
-   * @param recipe - 菜谱数据（不包含 id 和 createdAt）
-   * @returns 创建的菜谱（包含生成的 id）
+   * Create a new recipe
+   * @param recipe - Recipe data (excluding id and createdAt)
+   * @returns Created recipe (including generated id)
    */
   createRecipe: async (recipe: Omit<Recipe, 'id' | 'createdAt'>): Promise<Recipe> => {
     return apiCreateRecipe(recipe);
   },
 
   /**
-   * 完整更新菜谱 (PUT - 替换整个菜谱)
-   * @param id - 菜谱 ID
-   * @param recipe - 完整的菜谱数据
-   * @returns 更新后的菜谱
+   * Replace a recipe completely (PUT)
+   * @param id - Recipe ID
+   * @param recipe - Complete recipe data
+   * @returns Updated recipe
    */
   updateRecipe: async (id: string, recipe: Omit<Recipe, 'id' | 'createdAt'>): Promise<Recipe> => {
     return replaceRecipe(id, recipe);
   },
 
   /**
-   * 部分更新菜谱 (PATCH - 只更新指定字段)
-   * @param id - 菜谱 ID
-   * @param updates - 需要更新的字段
-   * @returns 更新后的菜谱
+   * Partially update a recipe (PATCH - only update specified fields)
+   * @param id - Recipe ID
+   * @param updates - Fields to update
+   * @returns Updated recipe
    */
   patchRecipe: async (id: string, updates: Partial<Recipe>): Promise<Recipe> => {
     return apiUpdateRecipe(id, updates);
   },
 
   /**
-   * 更新菜谱评分
-   * @param id - 菜谱 ID
-   * @param rating - 评分 (0-5)
-   * @returns 更新后的菜谱
+   * Update recipe rating
+   * @param id - Recipe ID
+   * @param rating - Rating (0-5)
+   * @returns Updated recipe
    */
   updateRating: async (id: string, rating: number): Promise<Recipe> => {
     return apiUpdateRecipe(id, { rating });
   },
 
   /**
-   * 切换收藏状态
-   * @param id - 菜谱 ID
-   * @param isWishlisted - 是否收藏
-   * @returns 更新后的菜谱
+   * Toggle wishlist status
+   * @param id - Recipe ID
+   * @param isWishlisted - Whether wishlisted
+   * @returns Updated recipe
    */
   toggleWishlist: async (id: string, isWishlisted: boolean): Promise<Recipe> => {
     return apiUpdateRecipe(id, { isWishlisted });
   },
 
   /**
-   * 删除菜谱
-   * @param id - 菜谱 ID
+   * Delete a recipe
+   * @param id - Recipe ID
    */
   deleteRecipe: async (id: string): Promise<void> => {
     return apiDeleteRecipe(id);
   },
 
   /**
-   * 从文本或 URL 提取菜谱
-   * @param textOrUrl - 文本内容或 URL
-   * @returns 提取的菜谱数据
+   * Extract recipe from text or URL
+   * @param textOrUrl - Text content or URL
+   * @returns Extracted recipe data
    */
   extractRecipe: async (textOrUrl: string): Promise<any> => {
     const isUrl = textOrUrl.startsWith('http://') || textOrUrl.startsWith('https://');
     
     if (isUrl) {
-      // 使用 URL 提取
+      // Use URL extraction
       return extractRecipeFromBackend('', textOrUrl);
     } else {
-      // 使用文本提取
+      // Use text extraction
       return extractRecipeFromBackend(textOrUrl);
     }
   }
 };
 
-// 导出类型定义
+// Export type definition
 export type RecipeService = typeof recipeService;

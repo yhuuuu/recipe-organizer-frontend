@@ -27,14 +27,14 @@ export function EditRecipeModal({ open, onOpenChange, recipe }: EditRecipeModalP
     sourceUrl: '',
   });
 
-  // 图片上传相关
+  // Upload picture handling
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
 
-  // 处理图片文件转换为 Base64
+  // Handle image file and convert to Base64
   const handleImageFile = (file: File) => {
     if (!file.type.startsWith('image/')) {
-      alert('请选择图片文件');
+      alert('Please select an image file');
       return;
     }
 
@@ -46,17 +46,17 @@ export function EditRecipeModal({ open, onOpenChange, recipe }: EditRecipeModalP
     reader.readAsDataURL(file);
   };
 
-  // 上传图片
+  // Upload picture
   const handleUploadClick = () => {
     fileInputRef.current?.click();
   };
 
-  // 拍照
+  // Take photo
   const handleCameraClick = () => {
     cameraInputRef.current?.click();
   };
 
-  // 清除图片
+  // Clear image
   const handleClearImage = () => {
     setFormData({ ...formData, image: '' });
   };
@@ -137,9 +137,9 @@ export function EditRecipeModal({ open, onOpenChange, recipe }: EditRecipeModalP
 
           {/* Image URL */}
           <div>
-            <label className="block text-sm font-medium mb-2">封面图片</label>
+            <label className="block text-sm font-medium mb-2">Cover Image</label>
             
-            {/* 图片预览 */}
+            {/* Image preview */}
             {formData.image && (
               <div className="relative mb-3">
                 <img 
@@ -162,7 +162,7 @@ export function EditRecipeModal({ open, onOpenChange, recipe }: EditRecipeModalP
               </div>
             )}
 
-            {/* 上传按钮组 */}
+            {/* Upload button group */}
             <div className="flex gap-2">
               <Button
                 type="button"
@@ -171,7 +171,7 @@ export function EditRecipeModal({ open, onOpenChange, recipe }: EditRecipeModalP
                 className="flex-1"
               >
                 <Upload className="w-4 h-4 mr-2" />
-                上传图片
+                Upload Image
               </Button>
               <Button
                 type="button"
@@ -180,11 +180,11 @@ export function EditRecipeModal({ open, onOpenChange, recipe }: EditRecipeModalP
                 className="flex-1"
               >
                 <Camera className="w-4 h-4 mr-2" />
-                拍照
+                Take Photo
               </Button>
             </div>
 
-            {/* 隐藏的文件输入 */}
+            {/* Hidden file inputs */}
             <input
               ref={fileInputRef}
               type="file"
@@ -207,13 +207,13 @@ export function EditRecipeModal({ open, onOpenChange, recipe }: EditRecipeModalP
               }}
             />
 
-            {/* 或者输入 URL */}
+            {/* Or enter URL */}
             <div className="mt-2">
               <Input
                 type="url"
                 value={formData.image.startsWith('data:') ? '' : formData.image}
                 onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                placeholder="或粘贴图片 URL"
+                placeholder="Or paste image URL"
               />
             </div>
           </div>

@@ -76,13 +76,13 @@ export async function extractRecipeFromBackend(
     // Check for network errors
     if (error instanceof TypeError && error.message.includes('fetch')) {
       console.error('❌ Network error - Backend might not be running:', error);
-      throw new Error('无法连接到后端服务器，请确保后端服务正在运行 (http://localhost:4000)');
+      throw new Error('Unable to connect to backend server. Please ensure the backend service is running (http://localhost:4000)');
     }
 
     // Check for CORS errors
     if (error instanceof Error && error.message.includes('CORS')) {
       console.error('❌ CORS error:', error);
-      throw new Error('CORS 错误 - 后端需要配置 CORS 允许前端访问');
+      throw new Error('CORS error - Backend needs to configure CORS to allow frontend access');
     }
 
     console.error('❌ Backend extraction error:', error);

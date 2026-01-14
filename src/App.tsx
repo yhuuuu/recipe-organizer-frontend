@@ -5,7 +5,6 @@ import { Wishlist } from './pages/Wishlist';
 import { Auth } from './pages/Auth';
 import { AddRecipe } from './pages/AddRecipe';
 import { EditRecipe } from './pages/EditRecipe';
-import { RecipeList } from './pages/RecipeList';
 import { Navigation } from './components/Navigation';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import './index.css';
@@ -59,16 +58,6 @@ function App() {
           element={
             <ProtectedRoute>
               <EditRecipe />
-            </ProtectedRoute>
-          }
-        />
-        
-        {/* 简化版菜谱列表页面（可选） */}
-        <Route
-          path="/list"
-          element={
-            <ProtectedRoute>
-              <RecipeList />
             </ProtectedRoute>
           }
         />

@@ -7,7 +7,7 @@ interface ProtectedRouteProps {
 
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
   if (!authService.isAuthenticated()) {
-    // 未登录，重定向到登录页
+    // Not logged in, redirect to login page
     return <Navigate to="/auth" replace />;
   }
 

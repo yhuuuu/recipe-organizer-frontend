@@ -34,14 +34,14 @@ export function AddRecipeModal({ open, onOpenChange }: AddRecipeModalProps) {
     rating: 0,
   });
 
-  // 图片上传相关
+  // Upload picture handling
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
 
-  // 处理图片文件转换为 Base64
+  // Handle image file and convert to Base64
   const handleImageFile = (file: File) => {
     if (!file.type.startsWith('image/')) {
-      alert('请选择图片文件');
+      alert('Please select an image file');
       return;
     }
 
@@ -53,17 +53,17 @@ export function AddRecipeModal({ open, onOpenChange }: AddRecipeModalProps) {
     reader.readAsDataURL(file);
   };
 
-  // 上传图片
+  // Upload picture
   const handleUploadClick = () => {
     fileInputRef.current?.click();
   };
 
-  // 拍照
+  // Take photo
   const handleCameraClick = () => {
     cameraInputRef.current?.click();
   };
 
-  // 清除图片
+  // Clear image
   const handleClearImage = () => {
     setFormData({ ...formData, image: '' });
   };
@@ -141,7 +141,7 @@ export function AddRecipeModal({ open, onOpenChange }: AddRecipeModalProps) {
       console.log('✅ Form data updated successfully');
     } catch (error) {
       console.error('❌ Extraction error:', error);
-      alert(`提取失败：${error instanceof Error ? error.message : '请尝试手动输入或检查内容格式'}`);
+      alert(`Extraction failed: ${error instanceof Error ? error.message : 'Please try manual input or check the content format'}`);
     } finally {
       setIsExtracting(false);
     }
@@ -231,7 +231,7 @@ export function AddRecipeModal({ open, onOpenChange }: AddRecipeModalProps) {
       onOpenChange(false);
     } catch (error) {
       console.error('❌ Extraction+Save error:', error);
-      alert(`提取或保存失败：${error instanceof Error ? error.message : '请稍后重试或手动输入'}`);
+      alert(`Extraction or save failed: ${error instanceof Error ? error.message : 'Please try again later or enter manually'}`);
     } finally {
       setIsExtracting(false);
     }
@@ -314,7 +314,7 @@ export function AddRecipeModal({ open, onOpenChange }: AddRecipeModalProps) {
                   onClick={() => setInputMode('url')}
                   className="flex-1"
                 >
-                  输入链接
+                  Enter URL
                 </Button>
                 <Button
                   variant={inputMode === 'text' ? 'default' : 'outline'}
@@ -323,7 +323,7 @@ export function AddRecipeModal({ open, onOpenChange }: AddRecipeModalProps) {
                   className="flex-1"
                 >
                   <FileText className="w-4 h-4 mr-2" />
-                  粘贴内容
+                  Paste Content
                 </Button>
               </div>
 
@@ -333,7 +333,7 @@ export function AddRecipeModal({ open, onOpenChange }: AddRecipeModalProps) {
                   <div className="flex gap-2">
                     <Input
                       type="url"
-                      placeholder="输入食谱网页链接（如下厨房、豆果美食、AllRecipes等）"
+                      placeholder="Enter recipe website URL (e.g., rednote, Instagram)"
                       value={url}
                       onChange={(e) => setUrl(e.target.value)}
                       onKeyDown={(e) => {
@@ -345,10 +345,10 @@ export function AddRecipeModal({ open, onOpenChange }: AddRecipeModalProps) {
                         {isExtracting ? (
                           <>
                             <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                            提取中...
+                            Extracting...
                           </>
                         ) : (
-                          'AI 提取'
+                          'AI Extract'
                         )}
                       </Button>
                       <Button
@@ -359,10 +359,10 @@ export function AddRecipeModal({ open, onOpenChange }: AddRecipeModalProps) {
                         {isExtracting ? (
                           <>
                             <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                            处理中...
+                            Processing...
                           </>
                         ) : (
-                          'AI 提取并添加'
+                          'AI Extract and Add'
                         )}
                       </Button>
                     </div>
@@ -371,11 +371,11 @@ export function AddRecipeModal({ open, onOpenChange }: AddRecipeModalProps) {
               ) : (
                 <div>
                   <label className="text-sm font-medium mb-2 block">
-                    粘贴食谱内容（支持小红书、网页文本等）
+                    Paste recipe content (supports rednote, web text, etc.)
                   </label>
                   <textarea
                     className="flex min-h-[200px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                    placeholder="粘贴完整的食谱内容，包括标题、材料、做法等..."
+                    placeholder="Paste the complete recipe content, including title, ingredients, instructions, etc..."
                     value={textContent}
                     onChange={(e) => setTextContent(e.target.value)}
                   />
@@ -388,10 +388,10 @@ export function AddRecipeModal({ open, onOpenChange }: AddRecipeModalProps) {
                       {isExtracting ? (
                         <>
                           <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          提取中...
+                          Extracting...
                         </>
                       ) : (
-                        'AI 提取食谱'
+                        'AI Extract Recipe'
                       )}
                     </Button>
                     <Button
@@ -402,17 +402,17 @@ export function AddRecipeModal({ open, onOpenChange }: AddRecipeModalProps) {
                       {isExtracting ? (
                         <>
                           <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          处理中...
+                          Processing...
                         </>
                       ) : (
-                        'AI 提取并添加'
+                        'AI Extract and Add'
                       )}
                     </Button>
                   </div>
                 </div>
               )}
 
-              <div className="text-center text-sm text-muted-foreground">或</div>
+              <div className="text-center text-sm text-muted-foreground">or</div>
 
               <Button
                 variant="outline"
@@ -420,7 +420,7 @@ export function AddRecipeModal({ open, onOpenChange }: AddRecipeModalProps) {
                 className="w-full"
               >
                 <Plus className="w-4 h-4 mr-2" />
-                手动输入
+                Manual Input
               </Button>
             </div>
           )}
@@ -437,9 +437,9 @@ export function AddRecipeModal({ open, onOpenChange }: AddRecipeModalProps) {
               </div>
 
               <div>
-                <label className="text-sm font-medium mb-2 block">封面图片</label>
+                <label className="text-sm font-medium mb-2 block">Cover Image</label>
                 
-                {/* 图片预览 */}
+                {/* Image preview */}
                 {formData.image && (
                   <div className="relative mb-3">
                     <img 
@@ -459,7 +459,7 @@ export function AddRecipeModal({ open, onOpenChange }: AddRecipeModalProps) {
                   </div>
                 )}
 
-                {/* 上传按钮组 */}
+                {/* Upload button group */}
                 <div className="flex gap-2">
                   <Button
                     type="button"
@@ -468,7 +468,7 @@ export function AddRecipeModal({ open, onOpenChange }: AddRecipeModalProps) {
                     className="flex-1"
                   >
                     <Upload className="w-4 h-4 mr-2" />
-                    上传图片
+                    Upload Image
                   </Button>
                   <Button
                     type="button"
@@ -477,11 +477,11 @@ export function AddRecipeModal({ open, onOpenChange }: AddRecipeModalProps) {
                     className="flex-1"
                   >
                     <Camera className="w-4 h-4 mr-2" />
-                    拍照
+                    Take Photo
                   </Button>
                 </div>
 
-                {/* 隐藏的文件输入 */}
+                {/* Hidden file inputs */}
                 <input
                   ref={fileInputRef}
                   type="file"
@@ -504,13 +504,13 @@ export function AddRecipeModal({ open, onOpenChange }: AddRecipeModalProps) {
                   }}
                 />
 
-                {/* 或者输入 URL */}
+                {/* Or enter URL */}
                 <div className="mt-2">
                   <Input
                     type="url"
                     value={formData.image.startsWith('data:') ? '' : formData.image}
                     onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                    placeholder="或粘贴图片 URL"
+                    placeholder="or paste image URL"
                   />
                 </div>
               </div>

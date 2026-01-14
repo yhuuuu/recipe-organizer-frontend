@@ -49,12 +49,12 @@ export function Navigation() {
                 </div>
                 <Button variant="ghost" onClick={handleLogout}>
                   <LogOut className="w-4 h-4 mr-2" />
-                  登出
+                  Log Out
                 </Button>
               </>
             ) : (
               <Button variant="default" asChild>
-                <Link to="/auth">登录</Link>
+                <Link to="/auth">Login</Link>
               </Button>
             )}
           </div>

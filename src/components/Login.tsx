@@ -9,7 +9,7 @@ interface FormData {
 }
 
 export function Login() {
-  const [isLogin, setIsLogin] = useState(true); // 切换登录/注册
+  const [isLogin, setIsLogin] = useState(true); // Switch between login and register
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [formData, setFormData] = useState<FormData>({
@@ -31,20 +31,21 @@ export function Login() {
 
     try {
       if (isLogin) {
-        // 登录
+        // Login
         await authService.login(formData.username, formData.password);
       } else {
-        // 注册
+        // Register
         await authService.register(
           formData.username,
           formData.email,
           formData.password
         );
       }
-      // 登录/注册成功，跳转到主页
+      
+      // Login/register successful, navigate to home page
       navigate('/');
     } catch (err) {
-      setError(err instanceof Error ? err.message : '操作失败');
+      setError(err instanceof Error ? err.message : 'Failed to authenticate');
     } finally {
       setLoading(false);
     }
@@ -52,13 +53,13 @@ export function Login() {
 
   return (
     <div style={{ maxWidth: '400px', margin: '50px auto', padding: '20px' }}>
-      <h2>{isLogin ? '登录' : '注册'}</h2>
+      <h2>{isLogin ? 'Login' : 'Register'}</h2>
       
       {error && <div style={{ color: 'red', marginBottom: '10px' }}>{error}</div>}
       
       <form onSubmit={handleSubmit}>
         <div style={{ marginBottom: '10px' }}>
-          <label>用户名:</label>
+          <label>Username:</label>
           <input
             type="text"
             name="username"
@@ -85,7 +86,7 @@ export function Login() {
         )}
 
         <div style={{ marginBottom: '10px' }}>
-          <label>密码:</label>
+          <label>Password:</label>
           <input
             type="password"
             name="password"
@@ -112,12 +113,12 @@ export function Login() {
             opacity: loading ? 0.6 : 1
           }}
         >
-          {loading ? '处理中...' : (isLogin ? '登录' : '注册')}
+          {loading ? 'Processing...' : (isLogin ? 'Login' : 'Register')}
         </button>
       </form>
 
       <p style={{ textAlign: 'center' }}>
-        {isLogin ? '还没有账户？' : '已有账户？'}
+        {isLogin ? "Don't have an account?" : 'Already have an account?'}
         <button
           onClick={() => {
             setIsLogin(!isLogin);
@@ -133,7 +134,7 @@ export function Login() {
             marginLeft: '5px'
           }}
         >
-          {isLogin ? '注册' : '登录'}
+          {isLogin ? 'Register' : 'Login'}
         </button>
       </p>
     </div>

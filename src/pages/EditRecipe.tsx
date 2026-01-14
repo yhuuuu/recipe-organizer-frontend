@@ -63,10 +63,10 @@ export function EditRecipe() {
             isWishlisted: data.isWishlisted
           });
         } else {
-          setError('菜谱不存在');
+          setError('Recipe not found');
         }
       } catch (err) {
-        setError(err instanceof Error ? err.message : '加载失败');
+        setError(err instanceof Error ? err.message : 'Failed to load');
       } finally {
         setLoadingRecipe(false);
       }
@@ -75,7 +75,7 @@ export function EditRecipe() {
     loadRecipe();
   }, [id, navigate]);
 
-  // 添加食材
+  // Add ingredient
   const addIngredient = () => {
     if (ingredientInput.trim()) {
       setRecipe(prev => ({
@@ -86,7 +86,7 @@ export function EditRecipe() {
     }
   };
 
-  // 移除食材
+  // Remove ingredient
   const removeIngredient = (index: number) => {
     setRecipe(prev => ({
       ...prev,
@@ -94,7 +94,7 @@ export function EditRecipe() {
     }));
   };
 
-  // 添加步骤
+  // Add step
   const addStep = () => {
     if (stepInput.trim()) {
       setRecipe(prev => ({
@@ -105,7 +105,7 @@ export function EditRecipe() {
     }
   };
 
-  // 移除步骤
+  // Remove step
   const removeStep = (index: number) => {
     setRecipe(prev => ({
       ...prev,
@@ -113,27 +113,27 @@ export function EditRecipe() {
     }));
   };
 
-  // 保存菜谱
+  // Save recipe
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!recipe.title.trim()) {
-      setError('菜谱名称不能为空');
+      setError('Recipe title cannot be empty');
       return;
     }
     
     if (recipe.ingredients.length === 0) {
-      setError('请至少添加一个食材');
+      setError('Please add at least one ingredient');
       return;
     }
     
     if (recipe.steps.length === 0) {
-      setError('请至少添加一个步骤');
+      setError('Please add at least one step');
       return;
     }
 
     if (!id) {
-      setError('菜谱 ID 不存在');
+      setError('Recipe ID does not exist');
       return;
     }
 
@@ -141,9 +141,9 @@ export function EditRecipe() {
       setLoading(true);
       setError('');
       await recipeService.updateRecipe(id, recipe);
-      navigate('/'); // 保存成功后返回菜谱列表
+      navigate('/'); // Save successful, return to recipe list
     } catch (err) {
-      setError(err instanceof Error ? err.message : '保存失败');
+      setError(err instanceof Error ? err.message : 'Save failed');
     } finally {
       setLoading(false);
     }
@@ -157,7 +157,7 @@ export function EditRecipe() {
         padding: '20px',
         textAlign: 'center' 
       }}>
-        <p>加载中...</p>
+        <p>Loading...</p>
       </div>
     );
   }
@@ -190,7 +190,7 @@ export function EditRecipe() {
             cursor: 'pointer'
           }}
         >
-          返回首页
+          Back to Home
         </button>
       </div>
     );
@@ -198,7 +198,7 @@ export function EditRecipe() {
 
   return (
     <div style={{ maxWidth: '800px', margin: '20px auto', padding: '20px' }}>
-      <h1>编辑菜谱</h1>
+      <h1>Edit Recipe</h1>
 
       {error && (
         <div style={{ 
@@ -213,18 +213,18 @@ export function EditRecipe() {
         </div>
       )}
 
-      {/* 菜谱编辑表单 */}
+      {/* Recipe Edit Form */}
       <form onSubmit={handleSubmit}>
-        {/* 菜谱名称 */}
+        {/* Recipe Title */}
         <div style={{ marginBottom: '15px' }}>
           <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-            菜谱名称 <span style={{ color: 'red' }}>*</span>
+            Recipe Title <span style={{ color: 'red' }}>*</span>
           </label>
           <input
             type="text"
             value={recipe.title}
             onChange={(e) => setRecipe(prev => ({ ...prev, title: e.target.value }))}
-            placeholder="输入菜谱名称"
+            placeholder="Enter recipe title"
             style={{ 
               width: '100%', 
               padding: '10px', 
@@ -235,10 +235,10 @@ export function EditRecipe() {
           />
         </div>
 
-        {/* 菜系 */}
+        {/* Cuisine */}
         <div style={{ marginBottom: '15px' }}>
           <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-            菜系
+            Cuisine
           </label>
           <select
             value={recipe.cuisine}
@@ -264,10 +264,10 @@ export function EditRecipe() {
           </select>
         </div>
 
-        {/* 图片 URL */}
+        {/* Image URL */}
         <div style={{ marginBottom: '15px' }}>
           <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-            图片 URL
+            Image URL
           </label>
           <input
             type="url"
@@ -285,7 +285,7 @@ export function EditRecipe() {
           {recipe.image && (
             <img 
               src={recipe.image} 
-              alt="预览" 
+              alt="Preview" 
               style={{ 
                 width: '100%', 
                 maxHeight: '200px', 
@@ -297,10 +297,10 @@ export function EditRecipe() {
           )}
         </div>
 
-        {/* 源 URL */}
+        {/* Source URL */}
         <div style={{ marginBottom: '15px' }}>
           <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-            菜谱来源
+            Source URL
           </label>
           <input
             type="url"
@@ -317,10 +317,10 @@ export function EditRecipe() {
           />
         </div>
 
-        {/* 食材 */}
+        {/* Ingredients */}
         <div style={{ marginBottom: '15px' }}>
           <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-            食材 <span style={{ color: 'red' }}>*</span>
+            Ingredients <span style={{ color: 'red' }}>*</span>
           </label>
           <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
             <input
@@ -333,7 +333,7 @@ export function EditRecipe() {
                   addIngredient();
                 }
               }}
-              placeholder="输入食材..."
+              placeholder="Enter ingredient..."
               style={{ 
                 flex: 1, 
                 padding: '10px', 
@@ -355,7 +355,7 @@ export function EditRecipe() {
                 whiteSpace: 'nowrap'
               }}
             >
-              添加
+              Add
             </button>
           </div>
           <div>
@@ -386,17 +386,17 @@ export function EditRecipe() {
                     fontSize: '12px'
                   }}
                 >
-                  删除
+                  Delete
                 </button>
               </div>
             ))}
           </div>
         </div>
 
-        {/* 步骤 */}
+        {/* Steps */}
         <div style={{ marginBottom: '15px' }}>
           <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
-            烹饪步骤 <span style={{ color: 'red' }}>*</span>
+            Cooking Steps <span style={{ color: 'red' }}>*</span>
           </label>
           <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
             <input
@@ -409,7 +409,7 @@ export function EditRecipe() {
                   addStep();
                 }
               }}
-              placeholder="输入步骤..."
+              placeholder="Enter step..."
               style={{ 
                 flex: 1, 
                 padding: '10px', 
@@ -431,7 +431,7 @@ export function EditRecipe() {
                 whiteSpace: 'nowrap'
               }}
             >
-              添加
+              Add
             </button>
           </div>
           <div>
@@ -471,7 +471,7 @@ export function EditRecipe() {
           </div>
         </div>
 
-        {/* 按钮 */}
+        {/* Buttons */}
         <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
           <button
             type="submit"
@@ -489,7 +489,7 @@ export function EditRecipe() {
               opacity: loading ? 0.6 : 1
             }}
           >
-            {loading ? '保存中...' : '保存修改'}
+            {loading ? 'Saving...' : 'Save Changes'}
           </button>
           <button
             type="button"
@@ -508,7 +508,7 @@ export function EditRecipe() {
               opacity: loading ? 0.6 : 1
             }}
           >
-            取消
+            Cancel
           </button>
         </div>
       </form>

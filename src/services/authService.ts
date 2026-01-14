@@ -24,7 +24,7 @@ export interface User {
 }
 
 export const authService = {
-  // 注册
+  // Register a new user
   register: async (username: string, email: string, password: string): Promise<AuthResponse> => {
     const response = await fetch(`${API_URL}/auth/register`, {
       method: 'POST',
@@ -34,18 +34,18 @@ export const authService = {
     
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.error || error.errors?.[0]?.msg || '注册失败');
+      throw new Error(error.error || error.errors?.[0]?.msg || 'Registration failed');
     }
     
     const data: AuthResponse = await response.json();
-    // 保存 token 和用户信息
+    // Save token and user info
     localStorage.setItem('token', data.token);
     localStorage.setItem('userId', data.id);
     localStorage.setItem('username', data.username);
     return data;
   },
 
-  // 登录
+  // Login
   login: async (username: string, password: string): Promise<AuthResponse> => {
     const response = await fetch(`${API_URL}/auth/login`, {
       method: 'POST',
@@ -55,7 +55,7 @@ export const authService = {
     
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.error || '登录失败');
+      throw new Error(error.error || 'Login failed');
     }
     
     const data: AuthResponse = await response.json();
@@ -65,20 +65,20 @@ export const authService = {
     return data;
   },
 
-  // 登出
+  // Logout
   logout: (): void => {
     localStorage.removeItem('token');
     localStorage.removeItem('userId');
     localStorage.removeItem('username');
   },
 
-  // 获取当前 token
+  // Get current token
   getToken: (): string | null => localStorage.getItem('token'),
 
-  // 检查是否已登录
+  // Check if authenticated
   isAuthenticated: (): boolean => !!localStorage.getItem('token'),
 
-  // 获取当前用户信息
+  // Get current user info
   getCurrentUser: (): User => ({
     id: localStorage.getItem('userId'),
     username: localStorage.getItem('username')

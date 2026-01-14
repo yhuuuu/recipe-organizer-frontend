@@ -21,7 +21,7 @@ export function RecipeDetail() {
   const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
-    // 检查是否已登录
+    // Check if user is authenticated
     if (!authService.isAuthenticated()) {
       navigate('/auth');
       return;

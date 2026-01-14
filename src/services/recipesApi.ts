@@ -3,7 +3,8 @@ import { authService } from './authService';
 
 const BASE = (import.meta.env.VITE_API_BASE_URL as string) || 'http://localhost:4000/api';
 
-// 获取认证请求头
+
+// Get auth headers for API requests
 const getAuthHeaders = (): Record<string, string> => {
   const token = authService.getToken();
   return {
@@ -12,7 +13,7 @@ const getAuthHeaders = (): Record<string, string> => {
   };
 };
 
-// 处理 401 未授权错误
+// Handle 401 Unauthorized errors
 const handle401 = () => {
   authService.logout();
   window.location.href = '/auth';
@@ -28,7 +29,7 @@ async function apiFetch<T = any>(path: string, opts: RequestInit = {}): Promise<
       headers: getAuthHeaders(),
     });
 
-    // 处理 401 未授权
+    // Handle unauthorized access
     if (res.status === 401) {
       handle401();
     }
@@ -58,7 +59,7 @@ async function apiFetch<T = any>(path: string, opts: RequestInit = {}): Promise<
   }
 }
 
-// 获取所有菜谱（支持搜索和过滤）
+// Get all recipes (supports search and filtering)
 export async function fetchRecipes(q?: string, cuisine?: string): Promise<Recipe[]> {
   try {
     const params = new URLSearchParams();
@@ -80,7 +81,7 @@ export async function fetchRecipes(q?: string, cuisine?: string): Promise<Recipe
   }
 }
 
-// 获取单个菜谱
+// Get a single recipe
 export async function fetchRecipeById(id: string): Promise<Recipe | null> {
   try {
     const recipe = await apiFetch<any>(`/recipes/${id}`);
@@ -95,7 +96,7 @@ export async function fetchRecipeById(id: string): Promise<Recipe | null> {
   }
 }
 
-// 创建新菜谱
+// Create a new recipe
 export async function createRecipe(recipe: Omit<Recipe, 'id' | 'createdAt'>): Promise<Recipe> {
   try {
     const createdRecipe = await apiFetch<any>('/recipes', { 
@@ -113,7 +114,7 @@ export async function createRecipe(recipe: Omit<Recipe, 'id' | 'createdAt'>): Pr
   }
 }
 
-// 完整更新菜谱 (PUT)
+// Replace a recipe completely (PUT)
 export async function replaceRecipe(id: string, recipe: Omit<Recipe, 'id' | 'createdAt'>): Promise<Recipe> {
   try {
     const updatedRecipe = await apiFetch<any>(`/recipes/${id}`, { 
