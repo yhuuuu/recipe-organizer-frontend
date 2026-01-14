@@ -52,17 +52,30 @@ npm install
 
 4. **Configure environment variables**
 
-   - The `.env` file should contain:
-   ```
+   Create a `.env` file in the project root:
+   
+   **For local development:**
+   ```env
    VITE_API_BASE_URL=http://localhost:4000/api
+   ```
+   
+   **For production (Netlify):**
+   
+   Set environment variable in Netlify Dashboard → Site settings → Environment variables:
+   ```env
+   VITE_API_BASE_URL=https://haohaochifan-api.onrender.com/api
    ```
 
 5. **Set up your backend server**
 
-   You need a separate backend server running on port 4000. The backend should:
+   You need a separate backend server. The backend should:
    - Connect to your MongoDB Atlas database
    - Provide REST API endpoints for recipes CRUD operations
    - Handle the connection string: `mongodb+srv://username:password@cluster.mongodb.net/recipe-organizer`
+   
+   **Backend URLs:**
+   - Local: `http://localhost:4000`
+   - Production: `https://haohaochifan-api.onrender.com`
 
 6. **Start the development server**
 

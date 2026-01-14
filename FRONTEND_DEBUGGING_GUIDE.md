@@ -1,10 +1,21 @@
 # Frontend Debugging Guide
 
+## 🔐 Authentication Status
+
+**`/api/extract` endpoint does NOT require authentication** ✅
+
+- ✅ Anonymous users can call this endpoint
+- ✅ No token required
+- ✅ Verified by testing without token (successful response)
+- ℹ️ Other endpoints like `/api/recipes` (POST/PUT/DELETE) require JWT authentication
+
+---
+
 ## ✅ Completed Changes
 
 ### 1. Added Backend API Calls
 Created `src/services/backendExtractor.ts`, implementing:
-- ✅ Call backend `/api/extract` endpoint
+- ✅ Call backend `/api/extract` endpoint (no auth required)
 - ✅ Complete error handling and logging
 - ✅ Network error detection
 - ✅ CORS error detection
@@ -181,11 +192,24 @@ cp .env.example .env
 ```
 
 ### Configuration Content:
-```
+
+**Local Development:**
+```env
 VITE_API_BASE_URL=http://localhost:4000/api
 ```
 
-Ensure backend server is running at `http://localhost:4000`
+**Production (Netlify):**
+
+Set environment variable in Netlify Dashboard:
+```env
+VITE_API_BASE_URL=https://haohaochifan-api.onrender.com/api
+```
+
+**Backend URLs:**
+- Local: `http://localhost:4000`
+- Production: `https://haohaochifan-api.onrender.com`
+
+Ensure backend server is running at the appropriate URL
 
 ## 📊 Data Flow Diagram
 
