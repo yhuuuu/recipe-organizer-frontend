@@ -67,12 +67,6 @@
 **`src/pages/RecipeDetail.tsx`**
 - ✅ Login check
 
-**`src/pages/RecipeList.tsx`** - Simplified list page (backup)
-- ✅ Complete authentication flow
-- ✅ Search and filter
-- ✅ User welcome message
-- ✅ Logout button
-
 ### 5. Route Configuration (`src/App.tsx`)
 ```typescript
 <Route path="/auth" element={<Auth />} />
@@ -205,14 +199,6 @@ Use src/pages/Auth.tsx + src/pages/Home.tsx
 - ✅ Animation effects
 - ✅ Responsive design
 - ✅ Full accessibility
-
-### Simplified Configuration (Native styles)
-```
-Use src/components/Login.tsx + src/pages/RecipeList.tsx
-```
-- ✅ Native HTML + inline styles
-- ✅ Simpler and more direct
-- ✅ Easy to customize
 
 ## 📝 Environment Variables
 

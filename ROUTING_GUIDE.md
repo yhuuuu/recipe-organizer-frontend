@@ -18,7 +18,6 @@
 | `/wishlist` | `Wishlist.tsx` | Favorites/Wishlist |
 | `/add-recipe` | `AddRecipe.tsx` | Add recipe (standalone page) |
 | `/edit-recipe/:id` | `EditRecipe.tsx` | Edit recipe (standalone page) |
-| `/list` | `RecipeList.tsx` | Recipe list (simplified version) |
 
 ### **Special Routes**
 
@@ -74,9 +73,6 @@ navigate(`/edit-recipe/${recipeId}`);
 
 // Wishlist
 navigate('/wishlist');
-
-// Simplified list view
-navigate('/list');
 ```
 
 ### **Using Links**
@@ -146,7 +142,6 @@ const [isModalOpen, setIsModalOpen] = useState(false);
 ### **Alternative Options (Optional)**
 - ⚠️ Standalone add page: `/add-recipe`
 - ⚠️ Standalone edit page: `/edit-recipe/:id`
-- ⚠️ Simplified list page: `/list`
 
 ## 🔍 Route Debugging
 
@@ -280,7 +275,7 @@ const rating = searchParams.get('rating');
 - [ ] Access `/auth` after login → Can access (logged-in users can view login page)
 - [ ] Access non-existent path `/xyz` → Redirect to `/`
 - [ ] Both `/login` and `/auth` access login page
-- [ ] Standalone page routes work: `/add-recipe`, `/edit-recipe/123`, `/list`
+- [ ] Standalone page routes work: `/add-recipe`, `/edit-recipe/123`
 
 ## 🎨 Custom Route Layouts
 
@@ -321,7 +316,7 @@ function LayoutWithNav() {
 Current routing configuration provides flexible options:
 
 1. **Primary paths**: `/`, `/auth`, `/recipe/:id`, `/wishlist`
-2. **Alternative page paths**: `/add-recipe`, `/edit-recipe/:id`, `/list`
+2. **Alternative page paths**: `/add-recipe`, `/edit-recipe/:id`
 3. **Compatibility path**: `/login` → `/auth`
 4. **All routes have authentication protection** (except `/auth` and `/login`)
 5. **Unmatched paths automatically redirect to home**
