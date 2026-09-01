@@ -1,7 +1,8 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Home, Heart, LogOut, User } from 'lucide-react';
-import { Button } from './ui/button';
+import { Button, buttonVariants } from './ui/button';
 import { authService } from '@/services/authService';
+import { cn } from '@/utils/cn';
 
 export function Navigation() {
   const location = useLocation();
@@ -22,24 +23,28 @@ export function Navigation() {
             Recipe Organizer
           </Link>
           <div className="flex items-center gap-2">
-            <Button
-              variant={location.pathname === '/' ? 'default' : 'ghost'}
-              asChild
+            <Link
+              to="/"
+              className={cn(
+                buttonVariants({
+                  variant: location.pathname === '/' ? 'default' : 'ghost',
+                })
+              )}
             >
-              <Link to="/">
-                <Home className="w-4 h-4 mr-2" />
-                Home
-              </Link>
-            </Button>
-            <Button
-              variant={location.pathname === '/wishlist' ? 'default' : 'ghost'}
-              asChild
+              <Home className="w-4 h-4 mr-2" />
+              Home
+            </Link>
+            <Link
+              to="/wishlist"
+              className={cn(
+                buttonVariants({
+                  variant: location.pathname === '/wishlist' ? 'default' : 'ghost',
+                })
+              )}
             >
-              <Link to="/wishlist">
-                <Heart className="w-4 h-4 mr-2" />
-                Wishlist
-              </Link>
-            </Button>
+              <Heart className="w-4 h-4 mr-2" />
+              Wishlist
+            </Link>
 
             {isAuthenticated ? (
               <>
@@ -53,9 +58,9 @@ export function Navigation() {
                 </Button>
               </>
             ) : (
-              <Button variant="default" asChild>
-                <Link to="/auth">Login</Link>
-              </Button>
+              <Link to="/auth" className={buttonVariants()}>
+                Login
+              </Link>
             )}
           </div>
         </div>
@@ -63,4 +68,3 @@ export function Navigation() {
     </nav>
   );
 }
-
