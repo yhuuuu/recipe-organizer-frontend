@@ -1,221 +1,140 @@
-# Recipe Organizer Web Application
+# Haohaochifan — Frontend
 
-A modern, full-featured recipe organizer web application built with React, TypeScript, and MongoDB. Save, organize, and view recipes from online sources with AI-powered extraction.
+Paste a recipe link, let AI read it, and keep the result. A React + TypeScript
+single-page app backed by a separate Express/MongoDB API.
+
+- **Live:** https://haohaochifan.netlify.app
+- **API:** https://haohaochifan-api.onrender.com
+- **Backend repo:** https://github.com/yhuuuu/recipe-organizer-backend
 
 ## Features
 
-- 🍳 **AI-Powered Recipe Extraction** - Automatically extract recipe information from recipe website URLs
-- 📸 **Image Upload** - Upload or take photos for recipe covers
-- 📱 **Responsive Design** - Beautiful UI that works on all devices
-- ⭐ **Rating System** - Rate your favorite recipes
-- ❤️ **Wishlist** - Save recipes for later
-- 🔍 **Search & Filter** - Find recipes by cuisine, title, or ingredients
-- 🎨 **Modern UI** - Built with TailwindCSS and shadcn/ui components
-- ✨ **Smooth Animations** - Powered by Framer Motion
+- **AI recipe extraction** — paste a URL or raw text; the backend scrapes and
+  parses it into title, ingredients, steps and cuisine
+- **Works without an account** — visitors browse sample recipes and run
+  extractions immediately; signing in only adds a saved, searchable collection
+- **Export to your device** — save any recipe as an image, PDF or Markdown file,
+  no account required
+- **Wishlist, ratings, search and cuisine filters** for signed-in users
+- **Responsive**, including the iOS Safari quirks that usually break layouts
 
-## Tech Stack
+## Tech stack
 
-- **Frontend**: React 18 + Vite + TypeScript
-- **Styling**: TailwindCSS
-- **UI Components**: shadcn/ui
-- **Animations**: Framer Motion
-- **State Management**: Zustand
-- **Backend**: MongoDB Atlas
-- **Routing**: React Router v6
+React 18 · Vite · TypeScript · TailwindCSS · Zustand · React Router v6 ·
+Framer Motion · Vitest + Testing Library
 
-## Getting Started
+## Getting started
 
-### Prerequisites
-
-- Node.js 18+ and npm/yarn/pnpm
-- MongoDB Atlas account (free tier works)
-
-### Installation
-
-1. **Clone or navigate to the project directory**
-
-```bash
-cd "Recipe Organizer"
-```
-
-2. **Install dependencies**
+Requires Node.js 18+.
 
 ```bash
 npm install
 ```
 
-3. **Set up MongoDB Atlas**
+Create `.env` in the project root:
 
-   - Create a new project at [MongoDB Atlas](https://cloud.mongodb.com/)
-   - Create a cluster and database
-   - Get your connection string
-
-4. **Configure environment variables**
-
-   Create a `.env` file in the project root:
-   
-   **For local development:**
-   ```env
-   VITE_API_BASE_URL=http://localhost:4000/api
-   ```
-   
-   **For production (Netlify):**
-   
-   Set environment variable in Netlify Dashboard → Site settings → Environment variables:
-   ```env
-   VITE_API_BASE_URL=https://haohaochifan-api.onrender.com/api
-   ```
-
-5. **Set up your backend server**
-
-   You need a separate backend server. The backend should:
-   - Connect to your MongoDB Atlas database
-   - Provide REST API endpoints for recipes CRUD operations
-   - Handle the connection string: `mongodb+srv://username:password@cluster.mongodb.net/recipe-organizer`
-   
-   **Backend URLs:**
-   - Local: `http://localhost:4000`
-   - Production: `https://haohaochifan-api.onrender.com`
-
-6. **Start the development server**
-
-```bash
-npm run dev
+```env
+VITE_API_BASE_URL=http://localhost:4000/api
 ```
 
-7. **Open your browser**
+In production, set the same variable in Netlify → Site settings → Environment
+variables, pointing at `https://haohaochifan-api.onrender.com/api`.
 
-Navigate to `http://localhost:5173`
+```bash
+npm run dev      # http://localhost:5173
+npm run build    # tsc && vite build → dist/
+npm test         # vitest (watch); npm test -- --run for one pass
+```
 
-## Project Structure
+The app needs the backend running for extraction and for signed-in accounts.
+Guests see the bundled sample recipes, so the UI is usable without it.
+
+> `npm run lint` is defined but there is no ESLint config in the repo, so it
+> currently fails. Type errors are caught by `npm run build` in the meantime.
+
+## Design system
+
+Three colours only — white, lemon `#f8fc52`, ink black — with Fraunces as the
+display face. All of it is defined in `src/index.css`.
+
+**Lemon never carries text.** Against white it measures ~1.10:1 contrast, far
+below the 4.5:1 minimum, so it is used exclusively as a fill. Text placed on
+lemon is always ink (16.7:1). Links and the `link` button variant use
+underlined ink rather than a lemon tint for the same reason.
+
+Two things that are easy to get wrong here:
+
+- **Buttons on lemon must be styled with utilities, not custom classes.**
+  tailwind-merge cannot tell that a component-layer class conflicts with the
+  `bg-primary` inside a button variant, so the yellow fill survives and wins.
+- **Inputs are 16px on phones** (`text-base sm:text-sm`). iOS Safari zooms into
+  any focused field smaller than that and never zooms back out.
+
+## Project structure
 
 ```
 src/
-├── components/          # Reusable UI components
-│   ├── ui/             # shadcn/ui components
-│   ├── RecipeCard.tsx
-│   ├── AddRecipeModal.tsx
+├── components/
+│   ├── ui/                  # button, input, dialog, badge
+│   ├── RecipeRow.tsx        # full-width row: photo + lemon text panel
+│   ├── AddRecipeModal.tsx   # extract, review, export or save
+│   ├── EditRecipeModal.tsx
+│   ├── FilterBar.tsx        # cuisine chips
+│   ├── HeroIllustrations.tsx
+│   ├── Footer.tsx           # asset attribution — see Licensing
+│   ├── Navigation.tsx
 │   ├── RatingStars.tsx
-│   └── FilterBar.tsx
-├── pages/              # Page components
-│   ├── Home.tsx
-│   ├── RecipeDetail.tsx
-│   └── Wishlist.tsx
-├── store/              # Zustand state management
-│   └── recipesStore.ts
-├── services/           # API and external services
-│   ├── recipesApi.ts
-│   ├── aiExtractor.ts
-│   ├── textExtractor.ts
-│   └── backendExtractor.ts
-├── types/              # TypeScript type definitions
-│   └── Recipe.ts
-├── utils/              # Utility functions
-│   ├── cn.ts
-│   └── parseCuisine.ts
-├── App.tsx             # Main app component with routing
-├── main.tsx            # Entry point
-└── index.css           # Global styles
+│   └── ProtectedRoute.tsx
+├── pages/                   # Home, RecipeDetail, Wishlist, Auth
+├── data/demoRecipes.ts      # samples shown to guests
+├── store/recipesStore.ts    # Zustand; guest vs authenticated state
+├── services/                # API clients, extraction
+├── utils/exportRecipe.ts    # image / PDF / Markdown export
+└── index.css                # design system: colours, fonts, .pill, .lemon-panel
 ```
 
-## Usage
+`pages/AddRecipe.tsx` and `pages/EditRecipe.tsx` are older inline-styled screens
+still routed at `/add` and `/edit/:id`. Nothing in the UI links to them — adding
+and editing happen in modals — and they have not been restyled or made
+responsive.
 
-### Adding a Recipe
+## Guest mode
 
-1. Click the "Add Recipe" button
-2. Paste a recipe URL from any website
-3. Click "Extract with AI" to automatically extract recipe information
-4. Review and edit the extracted data if needed
-5. Click "Save Recipe"
+Guests get a real, working demo rather than a locked door, which means some
+state is deliberately client-side only:
 
-Alternatively, you can manually enter recipe details by clicking "Enter Manually".
+- `demoRecipes.ts` supplies the recipe list; filtering happens in the browser
+- The cuisine filter derives its options from the loaded data **for guests only**.
+  A signed-in user's `recipes` array is already filtered server-side, so
+  deriving from it would make every other chip disappear once one was picked.
+- Wishlist and delete controls are hidden from guests. The wishlist write fails
+  with a 401 that the store swallows, so the heart would appear to work while
+  `/wishlist` bounced them to login and the save was silently lost.
 
-### Viewing Recipes
-
-- Browse all recipes on the home page
-- Use the filter buttons to filter by cuisine (Chinese, Western, Italian, Japanese, Korean)
-- Use the search bar to search by title or ingredient
-- Click on any recipe card to view full details
-
-### Rating Recipes
-
-- Click on the star rating on a recipe card or detail page
-- Select a rating from 1 to 5 stars
-- Ratings are automatically saved
-
-### Wishlist
-
-- Click the heart icon on any recipe to add it to your wishlist
-- View all wishlisted recipes on the Wishlist page
-- Click the heart again to remove from wishlist
-
-## AI Extraction
-
-The app includes AI-powered extraction for recipe websites.
-
-### How It Works
-
-1. Paste a recipe URL from any website
-2. The backend fetches the page content
-3. AI analyzes the content and extracts:
-   - Recipe title
-   - Ingredients list
-   - Cooking steps
-   - Cuisine type
-   - Recipe image
-
-### Setup (Optional)
-
-For enhanced AI extraction, you can configure an OpenAI API key:
-- Add to `.env`: `VITE_OPENAI_API_KEY=your-key`
-- This enables more accurate recipe parsing from complex web pages
-
-## Mock Data
-
-The app includes mock recipe data that will be used if the backend API is not available. This allows you to see the UI in action immediately after installation.
-
-## Building for Production
+## Testing
 
 ```bash
-npm run build
+npm test -- --run
 ```
 
-The built files will be in the `dist` directory.
+20 tests across the store, the edit modal and the export utilities.
 
 ## Deployment
 
-### Vercel
+Netlify, building `npm run build` and publishing `dist`. `VITE_API_BASE_URL`
+must be set in the dashboard. Pushes to `main` deploy automatically.
 
-1. Push your code to GitHub
-2. Import your repository in Vercel
-3. Add environment variables in Vercel dashboard
-4. Deploy!
+The API runs on a free Render instance that sleeps when idle, so the first
+extraction after a quiet period can take 30–60 seconds to wake it.
 
-### Netlify
+## Licensing of bundled assets
 
-1. Push your code to GitHub
-2. Import your repository in Netlify
-3. Build command: `npm run build`
-4. Publish directory: `dist`
-5. Add environment variables
-6. Deploy!
+The footer credits are **licence conditions, not decoration**:
 
-## Future Enhancements
+- Hero illustrations are Flaticon stickers by **paulalee**, free only with
+  visible attribution
+- Sample recipe photos come from Wikimedia Commons under **CC BY-SA** (Gerda
+  Arendt, HaJunkiyada) and CC0, requiring the author to be named
 
-- [ ] User authentication and multi-user support
-- [ ] Recipe sharing and social features
-- [ ] Meal planning
-- [ ] Shopping list generation
-- [ ] PDF export
-- [ ] Mobile app version
-- [ ] Image upload support
-- [ ] Recipe categories and tags
-
-## License
-
-MIT
-
-## Support
-
-For issues and questions, please open an issue on GitHub.
-
+If an asset is removed, its credit can go with it — not before. Photos from the
+original recipe sites are all rights reserved and must not be committed here.
