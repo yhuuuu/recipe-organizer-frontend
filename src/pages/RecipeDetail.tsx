@@ -155,10 +155,10 @@ export function RecipeDetail() {
 
           {/* Header */}
           <div className="mb-8">
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex-1">
-                <h1 className="font-display text-5xl font-bold mb-4">{recipe.title}</h1>
-                <div className="flex items-center gap-4 mb-4">
+            <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+              <div className="min-w-0 flex-1">
+                <h1 className="font-display text-3xl font-bold mb-4 break-words sm:text-5xl">{recipe.title}</h1>
+                <div className="flex flex-wrap items-center gap-4 mb-4">
                   <Badge
                     variant="secondary"
                     className="pill bg-primary px-4 py-1 text-base font-semibold text-primary-foreground"
@@ -173,7 +173,7 @@ export function RecipeDetail() {
                   />
                 </div>
               </div>
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
                 <Button
                   variant={recipe.isWishlisted ? 'default' : 'outline'}
                   onClick={handleWishlistToggle}

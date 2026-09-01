@@ -21,47 +21,54 @@ export function Navigation() {
         <div className="flex items-center justify-between h-16">
           <Link
             to="/"
-            className="font-display text-2xl font-extrabold italic tracking-tight"
+            className="font-display text-base font-extrabold italic tracking-tight sm:text-2xl"
           >
-            <span className="bg-primary px-2 text-primary-foreground">HAOHAOCHIFAN</span>
+            <span className="bg-primary px-1.5 text-primary-foreground sm:px-2">HAOHAOCHIFAN</span>
           </Link>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 sm:gap-2">
             <Link
               to="/"
               aria-current={location.pathname === '/' ? 'page' : undefined}
+              aria-label="Home"
               className={cn(
                 buttonVariants({
                   variant: location.pathname === '/' ? 'default' : 'ghost',
                 }),
-                'rounded-full'
+                'rounded-full px-3 sm:px-4'
               )}
             >
-              <Home className="w-4 h-4 mr-2" />
-              Home
+              <Home className="w-4 h-4 sm:mr-2" />
+              <span className="hidden sm:inline">Home</span>
             </Link>
             <Link
               to="/wishlist"
               aria-current={location.pathname === '/wishlist' ? 'page' : undefined}
+              aria-label="Wishlist"
               className={cn(
                 buttonVariants({
                   variant: location.pathname === '/wishlist' ? 'default' : 'ghost',
                 }),
-                'rounded-full'
+                'rounded-full px-3 sm:px-4'
               )}
             >
-              <Heart className="w-4 h-4 mr-2" />
-              Wishlist
+              <Heart className="w-4 h-4 sm:mr-2" />
+              <span className="hidden sm:inline">Wishlist</span>
             </Link>
 
             {isAuthenticated ? (
               <>
-                <div className="flex items-center gap-2 px-3 py-2 text-sm">
+                <div className="hidden items-center gap-2 px-3 py-2 text-sm sm:flex">
                   <User className="w-4 h-4" />
-                  <span>{currentUser.username}</span>
+                  <span className="max-w-[10ch] truncate">{currentUser.username}</span>
                 </div>
-                <Button variant="ghost" onClick={handleLogout} className="rounded-full">
-                  <LogOut className="w-4 h-4 mr-2" />
-                  Log Out
+                <Button
+                  variant="ghost"
+                  onClick={handleLogout}
+                  aria-label="Log out"
+                  className="rounded-full px-3 sm:px-4"
+                >
+                  <LogOut className="w-4 h-4 sm:mr-2" />
+                  <span className="hidden sm:inline">Log Out</span>
                 </Button>
               </>
             ) : (
@@ -71,7 +78,7 @@ export function Navigation() {
                 to="/auth"
                 className={cn(
                   buttonVariants(),
-                  'rounded-full bg-foreground text-background hover:bg-foreground/90'
+                  'rounded-full bg-foreground px-3 text-background hover:bg-foreground/90 sm:px-4'
                 )}
               >
                 Login

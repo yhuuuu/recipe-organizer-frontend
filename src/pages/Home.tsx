@@ -58,7 +58,7 @@ export function Home() {
               <p className="mb-5 text-xs font-bold uppercase tracking-[0.25em]">
                 Cook. Save. Enjoy.
               </p>
-              <h1 className="max-w-4xl font-display text-5xl font-extrabold leading-[0.95] tracking-tight sm:text-6xl lg:text-7xl">
+              <h1 className="max-w-4xl font-display text-4xl font-extrabold leading-[0.95] tracking-tight sm:text-6xl lg:text-7xl">
                 {isAuthenticated
                   ? 'Your kitchen, beautifully organized'
                   : 'Any recipe link, clean and readable'}

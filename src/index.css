@@ -91,5 +91,23 @@
   .ink-link {
     @apply font-medium underline decoration-2 underline-offset-4 hover:decoration-[3px];
   }
+
+  /*
+   * Modal height. On iOS Safari `vh` is resolved against the viewport with the
+   * toolbars retracted, so a 90vh panel is taller than what is actually on
+   * screen and its bottom buttons sit behind the browser chrome. `dvh` tracks
+   * the visible area instead. Kept here rather than as a utility so the vh
+   * fallback survives for older engines — two max-h utilities on one element
+   * would be collapsed to one by tailwind-merge.
+   */
+  .dialog-panel {
+    max-height: 90vh;
+  }
+
+  @supports (height: 100dvh) {
+    .dialog-panel {
+      max-height: 85dvh;
+    }
+  }
 }
 

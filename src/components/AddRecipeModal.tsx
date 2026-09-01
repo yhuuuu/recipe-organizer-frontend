@@ -344,7 +344,7 @@ export function AddRecipeModal({ open, onOpenChange }: AddRecipeModalProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent onClose={() => onOpenChange(false)} className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent onClose={() => onOpenChange(false)} className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>{isAuthenticated ? 'Add New Recipe' : 'Try AI Recipe Extraction'}</DialogTitle>
           <DialogDescription>
@@ -382,7 +382,7 @@ export function AddRecipeModal({ open, onOpenChange }: AddRecipeModalProps) {
               {inputMode === 'url' ? (
                 <div>
                   <label className="text-sm font-medium mb-2 block">Recipe URL</label>
-                  <div className="flex gap-2">
+                  <div className="flex flex-col gap-2 sm:flex-row">
                     <Input
                       type="url"
                       placeholder="Enter recipe website URL (e.g., rednote, Instagram)"
@@ -396,7 +396,7 @@ export function AddRecipeModal({ open, onOpenChange }: AddRecipeModalProps) {
                       <Button
                         onClick={handleExtract}
                         disabled={isExtracting || !url.trim()}
-                        className="pill bg-primary font-semibold text-primary-foreground hover:bg-primary/85"
+                        className="pill flex-1 bg-primary font-semibold text-primary-foreground hover:bg-primary/85 sm:flex-none"
                       >
                         {isExtracting ? (
                           <>
@@ -412,7 +412,9 @@ export function AddRecipeModal({ open, onOpenChange }: AddRecipeModalProps) {
                         onClick={handleExtractAndSave}
                         disabled={isExtracting || !url.trim()}
                         className={
-                          isAuthenticated ? 'pill bg-background hover:bg-primary/25' : 'hidden'
+                          isAuthenticated
+                            ? 'pill flex-1 bg-background hover:bg-primary/25 sm:flex-none'
+                            : 'hidden'
                         }
                       >
                         {isExtracting ? (
@@ -433,7 +435,7 @@ export function AddRecipeModal({ open, onOpenChange }: AddRecipeModalProps) {
                     Paste recipe content (supports rednote, web text, etc.)
                   </label>
                   <textarea
-                    className="flex min-h-[200px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                    className="flex min-h-[200px] w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:text-sm"
                     placeholder="Paste the complete recipe content, including title, ingredients, instructions, etc..."
                     value={textContent}
                     onChange={(e) => setTextContent(e.target.value)}
@@ -594,7 +596,7 @@ export function AddRecipeModal({ open, onOpenChange }: AddRecipeModalProps) {
               <div>
                 <label className="text-sm font-medium mb-2 block">Ingredients * (one per line)</label>
                 <textarea
-                  className="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  className="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:text-sm"
                   value={formData.ingredients}
                   onChange={(e) => setFormData({ ...formData, ingredients: e.target.value })}
                   placeholder="pasta&#10;garlic&#10;heavy cream"
@@ -604,7 +606,7 @@ export function AddRecipeModal({ open, onOpenChange }: AddRecipeModalProps) {
               <div>
                 <label className="text-sm font-medium mb-2 block">Steps * (one per line)</label>
                 <textarea
-                  className="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  className="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:text-sm"
                   value={formData.steps}
                   onChange={(e) => setFormData({ ...formData, steps: e.target.value })}
                   placeholder="Boil pasta&#10;Sauté garlic&#10;Add cream"
@@ -666,7 +668,7 @@ export function AddRecipeModal({ open, onOpenChange }: AddRecipeModalProps) {
                 </div>
 
                 <div className="border-t pt-3">
-                  <div className="flex gap-2">
+                  <div className="flex flex-col gap-2 sm:flex-row">
                     <Button
                       variant="secondary"
                       onClick={handleSave}
