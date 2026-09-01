@@ -6,6 +6,7 @@ import { Auth } from './pages/Auth';
 import { AddRecipe } from './pages/AddRecipe';
 import { EditRecipe } from './pages/EditRecipe';
 import { Navigation } from './components/Navigation';
+import { Footer } from './components/Footer';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import './index.css';
 
@@ -53,6 +54,7 @@ function App() {
         {/* 默认重定向 - 所有未匹配的路径重定向到首页 */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+      <Footer />
     </BrowserRouter>
   );
 }
