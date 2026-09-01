@@ -50,7 +50,19 @@ export async function extractRecipeFromBackend(
     if (!response.ok) {
       const errorText = await response.text().catch(() => '');
       console.error('❌ Backend API error:', response.status, errorText);
-      throw new Error(`Backend API error: ${response.status} ${response.statusText}`);
+
+      // Surface the backend's quota message instead of a generic status error.
+      let message = `Backend API error: ${response.status} ${response.statusText}`;
+      try {
+        const parsed = JSON.parse(errorText);
+        if (parsed?.error) message = parsed.error;
+      } catch {
+        // Non-JSON error body, keep the generic message.
+      }
+
+      const error = new Error(message) as Error & { status?: number };
+      error.status = response.status;
+      throw error;
     }
 
     const extractedRecipe = await response.json();
@@ -88,6 +100,15 @@ export async function extractRecipeFromBackend(
     console.error('❌ Backend extraction error:', error);
     throw error;
   }
+}
+
+/**
+ * True when the backend rejected the request because the AI extraction quota
+ * was exhausted. Callers should surface the message instead of silently
+ * falling back to a lower-quality local parser.
+ */
+export function isQuotaError(error: unknown): boolean {
+  return Boolean(error && typeof error === 'object' && (error as { status?: number }).status === 429);
 }
 
 /**

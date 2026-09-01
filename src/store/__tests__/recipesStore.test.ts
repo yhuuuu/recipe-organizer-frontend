@@ -4,14 +4,20 @@ import * as recipesApi from '@/services/recipesApi';
 import { Recipe } from '@/types/Recipe';
 
 // Mock the API
-vi.mock('@/services/recipesApi', () => ({
-  fetchRecipes: vi.fn(),
-  createRecipe: vi.fn(),
-  updateRecipe: vi.fn(),
-  deleteRecipe: vi.fn(),
-  updateRecipeRating: vi.fn(),
-  toggleWishlist: vi.fn(),
-}));
+vi.mock('@/services/recipesApi', async () => {
+  const actual = await vi.importActual<typeof import('@/services/recipesApi')>(
+    '@/services/recipesApi'
+  );
+  return {
+    AuthRequiredError: actual.AuthRequiredError,
+    fetchRecipes: vi.fn(),
+    createRecipe: vi.fn(),
+    updateRecipe: vi.fn(),
+    deleteRecipe: vi.fn(),
+    updateRecipeRating: vi.fn(),
+    toggleWishlist: vi.fn(),
+  };
+});
 
 describe('recipesStore', () => {
   beforeEach(() => {
@@ -98,6 +104,76 @@ describe('recipesStore', () => {
       // Verify state was not updated
       const state = useRecipesStore.getState();
       expect(state.recipes[0].title).toBe('Test Recipe');
+    });
+  });
+
+  describe('loadRecipes', () => {
+    it('serves read-only demo recipes to guests without calling the API', async () => {
+      localStorage.removeItem('token');
+
+      await useRecipesStore.getState().loadRecipes();
+
+      expect(recipesApi.fetchRecipes).not.toHaveBeenCalled();
+      expect(useRecipesStore.getState().recipes.length).toBeGreaterThan(0);
+      expect(useRecipesStore.getState().isLoading).toBe(false);
+    });
+
+    it('falls back to the guest demo when the session has expired', async () => {
+      localStorage.setItem('token', 'expired-token');
+      vi.mocked(recipesApi.fetchRecipes).mockRejectedValue(new recipesApi.AuthRequiredError());
+
+      await useRecipesStore.getState().loadRecipes();
+
+      const state = useRecipesStore.getState();
+      expect(state.isGuest).toBe(true);
+      expect(state.recipes.length).toBeGreaterThan(0);
+      expect(state.isLoading).toBe(false);
+    });
+
+    it('keeps the latest result when requests resolve out of order', async () => {
+      localStorage.setItem('token', 'test-token');
+      const firstResult: Recipe[] = [{
+        id: 'first',
+        title: 'First search',
+        image: '',
+        ingredients: [],
+        steps: [],
+        cuisine: 'Italian',
+        sourceUrl: '',
+        rating: 0,
+        isWishlisted: false,
+        createdAt: '2023-01-01T00:00:00Z',
+      }];
+      const latestResult: Recipe[] = [{
+        ...firstResult[0],
+        id: 'latest',
+        title: 'Latest search',
+      }];
+      let resolveFirst!: (recipes: Recipe[]) => void;
+      let resolveLatest!: (recipes: Recipe[]) => void;
+      const firstRequest = new Promise<Recipe[]>((resolve) => {
+        resolveFirst = resolve;
+      });
+      const latestRequest = new Promise<Recipe[]>((resolve) => {
+        resolveLatest = resolve;
+      });
+
+      vi.mocked(recipesApi.fetchRecipes)
+        .mockReturnValueOnce(firstRequest)
+        .mockReturnValueOnce(latestRequest);
+
+      useRecipesStore.setState({ searchQuery: 'first' });
+      const firstLoad = useRecipesStore.getState().loadRecipes();
+      useRecipesStore.setState({ searchQuery: 'latest' });
+      const latestLoad = useRecipesStore.getState().loadRecipes();
+
+      resolveLatest(latestResult);
+      await latestLoad;
+      resolveFirst(firstResult);
+      await firstLoad;
+
+      expect(useRecipesStore.getState().recipes).toEqual(latestResult);
+      expect(useRecipesStore.getState().isLoading).toBe(false);
     });
   });
 

@@ -17,24 +17,12 @@ function App() {
         {/* 公开路由 - 登录页 */}
         <Route path="/auth" element={<Auth />} />
         <Route path="/login" element={<Auth />} /> {/* 兼容 /login 路径 */}
-        
+
+        {/* 公开路由 - 游客可浏览示例菜谱并试用 AI 解析 */}
+        <Route path="/" element={<Home />} />
+        <Route path="/recipe/:id" element={<RecipeDetail />} />
+
         {/* 受保护的路由 - 需要登录 */}
-        <Route
-          path="/"
-          element={
-            <ProtectedRoute>
-              <Home />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/recipe/:id"
-          element={
-            <ProtectedRoute>
-              <RecipeDetail />
-            </ProtectedRoute>
-          }
-        />
         <Route
           path="/wishlist"
           element={

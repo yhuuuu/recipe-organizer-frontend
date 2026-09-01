@@ -1,12 +1,18 @@
 import { create } from 'zustand';
 import { Recipe, Cuisine } from '@/types/Recipe';
 import { recipeService } from '@/services/recipeService';
+import { authService } from '@/services/authService';
+import { AuthRequiredError } from '@/services/recipesApi';
+import { getDemoRecipes } from '@/data/demoRecipes';
+
+let latestLoadRequest = 0;
 
 interface RecipesState {
   recipes: Recipe[];
   selectedCuisine: Cuisine;
   searchQuery: string;
   isLoading: boolean;
+  isGuest: boolean;
   loadRecipes: () => Promise<void>;
   addRecipe: (recipe: Omit<Recipe, 'id' | 'createdAt'>) => Promise<void>;
   editRecipe: (id: string, recipe: Partial<Omit<Recipe, 'id' | 'createdAt'>>) => Promise<void>;
@@ -24,18 +30,38 @@ export const useRecipesStore = create<RecipesState>((set, get) => ({
   selectedCuisine: 'All',
   searchQuery: '',
   isLoading: false,
+  isGuest: !authService.isAuthenticated(),
 
   loadRecipes: async () => {
-    set({ isLoading: true });
+    const requestId = ++latestLoadRequest;
+
+    // Guests browse read-only sample data. Calling the API without a token
+    // would return 401 and bounce them straight to the login page.
+    if (!authService.isAuthenticated()) {
+      set({ recipes: getDemoRecipes(), isLoading: false, isGuest: true });
+      return;
+    }
+
+    set({ isLoading: true, isGuest: false });
     try {
       const { searchQuery, selectedCuisine } = get();
-      // 使用 recipeService 支持搜索和过滤
       const recipes = await recipeService.getAllRecipes(
         searchQuery || undefined,
         selectedCuisine !== 'All' ? selectedCuisine : undefined
       );
-      set({ recipes, isLoading: false });
+      if (requestId === latestLoadRequest) {
+        set({ recipes, isLoading: false });
+      }
     } catch (error) {
+      if (requestId !== latestLoadRequest) return;
+
+      // An expired/invalid session must not kick the visitor to the login
+      // page — degrade to the same read-only demo a first-time guest sees.
+      if (error instanceof AuthRequiredError) {
+        set({ recipes: getDemoRecipes(), isLoading: false, isGuest: true });
+        return;
+      }
+
       console.error('Error loading recipes:', error);
       set({ isLoading: false });
     }
@@ -130,14 +156,11 @@ export const useRecipesStore = create<RecipesState>((set, get) => ({
 
   setSelectedCuisine: (cuisine) => {
     set({ selectedCuisine: cuisine });
-    // 重新加载菜谱以应用过滤
     get().loadRecipes();
   },
 
   setSearchQuery: (query) => {
     set({ searchQuery: query });
-    // 重新加载菜谱以应用搜索
-    get().loadRecipes();
   },
 
   getFilteredRecipes: () => {
@@ -166,4 +189,3 @@ export const useRecipesStore = create<RecipesState>((set, get) => ({
     return get().recipes.filter((r) => r.isWishlisted);
   },
 }));
-

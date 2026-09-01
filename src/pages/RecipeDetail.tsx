@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Heart, ExternalLink, Edit, Trash2 } from 'lucide-react';
+import { ArrowLeft, Heart, ExternalLink, Edit, Trash2, Download, Printer, Image as ImageIcon, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useRecipesStore } from '@/store/recipesStore';
 import { authService } from '@/services/authService';
@@ -9,7 +9,9 @@ import { EditRecipeModal } from '@/components/EditRecipeModal';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Recipe } from '@/types/Recipe';
-import { fetchRecipeById } from '@/services/recipesApi';
+import { fetchRecipeById, AuthRequiredError } from '@/services/recipesApi';
+import { findDemoRecipe } from '@/data/demoRecipes';
+import { downloadRecipeAsMarkdown, printRecipe, saveRecipeAsImage } from '@/utils/exportRecipe';
 
 export function RecipeDetail() {
   const { id } = useParams<{ id: string }>();
@@ -19,14 +21,10 @@ export function RecipeDetail() {
   const [isLoading, setIsLoading] = useState(true);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isSavingImage, setIsSavingImage] = useState(false);
+  const isAuthenticated = authService.isAuthenticated();
 
   useEffect(() => {
-    // Check if user is authenticated
-    if (!authService.isAuthenticated()) {
-      navigate('/auth');
-      return;
-    }
-
     const loadRecipe = async () => {
       if (!id) return;
 
@@ -38,12 +36,24 @@ export function RecipeDetail() {
         return;
       }
 
+      // Guests only ever see the read-only sample recipes.
+      if (!authService.isAuthenticated()) {
+        setRecipe(findDemoRecipe(id));
+        setIsLoading(false);
+        return;
+      }
+
       // Otherwise fetch from API
       try {
         const fetchedRecipe = await fetchRecipeById(id);
         setRecipe(fetchedRecipe);
       } catch (error) {
-        console.error('Error loading recipe:', error);
+        // Session expired: fall back to the guest demo instead of a redirect.
+        if (error instanceof AuthRequiredError) {
+          setRecipe(findDemoRecipe(id));
+        } else {
+          console.error('Error loading recipe:', error);
+        }
       } finally {
         setIsLoading(false);
       }
@@ -71,8 +81,19 @@ export function RecipeDetail() {
     );
   }
 
-  const handleRatingChange = async (rating: number) => {
-    await updateRating(recipe.id, rating);
+  const handleSaveImage = async () => {
+    setIsSavingImage(true);
+    try {
+      await saveRecipeAsImage(recipe);
+    } catch (error) {
+      console.error('Error saving recipe image:', error);
+      alert('Could not create the image. Please try the PDF option instead.');
+    } finally {
+      setIsSavingImage(false);
+    }
+  };
+
+  const handleRatingChange = async (rating: number) => {    await updateRating(recipe.id, rating);
     setRecipe({ ...recipe, rating });
   };
 
@@ -164,14 +185,48 @@ export function RecipeDetail() {
                     variant="outline"
                     onClick={() => window.open(recipe.sourceUrl, '_blank')}
                     size="icon"
+                    aria-label="Open original source"
                   >
                     <ExternalLink className="w-5 h-5" />
                   </Button>
                 )}
                 <Button
                   variant="outline"
+                  onClick={handleSaveImage}
+                  disabled={isSavingImage}
+                  size="icon"
+                  aria-label="Save recipe as image"
+                  title="Save as image"
+                >
+                  {isSavingImage ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    <ImageIcon className="w-5 h-5" />
+                  )}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => printRecipe(recipe)}
+                  size="icon"
+                  aria-label="Print or save recipe as PDF"
+                  title="Print / Save as PDF"
+                >
+                  <Printer className="w-5 h-5" />
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => downloadRecipeAsMarkdown(recipe)}
+                  size="icon"
+                  aria-label="Download recipe as a text file"
+                  title="Download text file"
+                >
+                  <Download className="w-5 h-5" />
+                </Button>
+                <Button
+                  variant="outline"
                   onClick={() => setEditModalOpen(true)}
                   size="icon"
+                  className={isAuthenticated ? undefined : 'hidden'}
                 >
                   <Edit className="w-5 h-5" />
                 </Button>
@@ -180,6 +235,7 @@ export function RecipeDetail() {
                   onClick={handleDelete}
                   disabled={isDeleting}
                   size="icon"
+                  className={isAuthenticated ? undefined : 'hidden'}
                 >
                   <Trash2 className="w-5 h-5" />
                 </Button>

@@ -1,5 +1,6 @@
 import { Recipe } from '@/types/Recipe';
 import { authService } from './authService';
+import { getDemoRecipes } from '@/data/demoRecipes';
 
 const BASE = (import.meta.env.VITE_API_BASE_URL as string) || 'http://localhost:4000/api';
 
@@ -13,11 +14,27 @@ const getAuthHeaders = (): Record<string, string> => {
   };
 };
 
-// Handle 401 Unauthorized errors
+/**
+ * Thrown when the API rejects the request for auth reasons. Callers on public
+ * pages should degrade to the guest experience instead of masking this as
+ * "offline" data.
+ */
+export class AuthRequiredError extends Error {
+  constructor(message = 'Authentication required') {
+    super(message);
+    this.name = 'AuthRequiredError';
+  }
+}
+
+// Handle 401 Unauthorized errors.
+// The session is cleared, but we never force a redirect: public pages should
+// fall back to the read-only guest demo rather than bouncing the visitor to
+// the login screen. Protected routes redirect on their own once the token is gone.
 const handle401 = () => {
-  authService.logout();
-  window.location.href = '/auth';
-  throw new Error('Session expired');
+  if (authService.getToken()) {
+    authService.logout();
+  }
+  throw new AuthRequiredError();
 };
 
 async function apiFetch<T = any>(path: string, opts: RequestInit = {}): Promise<T> {
@@ -76,6 +93,7 @@ export async function fetchRecipes(q?: string, cuisine?: string): Promise<Recipe
       id: recipe._id || recipe.id,
     }));
   } catch (err) {
+    if (err instanceof AuthRequiredError) throw err;
     console.warn('fetchRecipes failed, falling back to mock data:', err);
     return getMockRecipes();
   }
@@ -91,6 +109,7 @@ export async function fetchRecipeById(id: string): Promise<Recipe | null> {
       id: recipe._id || recipe.id,
     };
   } catch (err) {
+    if (err instanceof AuthRequiredError) throw err;
     console.warn('fetchRecipeById failed, falling back to mock data:', err);
     return getMockRecipes().find((r) => r.id === id) || null;
   }
@@ -167,60 +186,7 @@ export async function deleteRecipe(id: string): Promise<void> {
   }
 }
 
-// Mock data for development fallback
+// Fallback data shared with the guest demo experience
 function getMockRecipes(): Recipe[] {
-  return [
-    {
-      id: '1',
-      title: 'Creamy Garlic Pasta',
-      image: 'https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?w=800',
-      ingredients: ['pasta', 'garlic', 'heavy cream', 'butter', 'salt', 'pepper'],
-      steps: [
-        'Boil pasta according to package instructions',
-        'Sauté minced garlic in butter until fragrant',
-        'Add heavy cream and bring to a simmer',
-        'Combine pasta with sauce and season to taste',
-      ],
-      cuisine: 'Italian',
-      sourceUrl: 'https://example.com/recipe1',
-      rating: 4,
-      isWishlisted: true,
-      createdAt: new Date().toISOString(),
-    },
-    {
-      id: '2',
-      title: 'Mapo Tofu',
-      image: 'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=800',
-      ingredients: ['tofu', 'ground pork', 'sichuan peppercorns', 'doubanjiang', 'garlic', 'ginger'],
-      steps: [
-        'Cut tofu into cubes',
-        'Sauté ground pork until browned',
-        'Add doubanjiang and aromatics',
-        'Add tofu and simmer until flavors meld',
-      ],
-      cuisine: 'Chinese',
-      sourceUrl: 'https://example.com/recipe2',
-      rating: 5,
-      isWishlisted: false,
-      createdAt: new Date().toISOString(),
-    },
-    {
-      id: '3',
-      title: 'Tonkatsu Ramen',
-      image: 'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=800',
-      ingredients: ['ramen noodles', 'pork belly', 'soft-boiled egg', 'nori', 'scallions', 'miso paste'],
-      steps: [
-        'Cook ramen noodles according to package',
-        'Prepare tonkatsu broth base',
-        'Top with sliced pork belly, egg, and nori',
-        'Garnish with scallions',
-      ],
-      cuisine: 'Japanese',
-      sourceUrl: 'https://example.com/recipe3',
-      rating: 5,
-      isWishlisted: true,
-      createdAt: new Date().toISOString(),
-    },
-  ];
+  return getDemoRecipes();
 }
-

@@ -12,9 +12,10 @@ interface RecipeCardProps {
   recipe: Recipe;
   index?: number;
   onEditClick?: () => void;
+  readOnly?: boolean;
 }
 
-export function RecipeCard({ recipe, index = 0, onEditClick }: RecipeCardProps) {
+export function RecipeCard({ recipe, index = 0, onEditClick, readOnly = false }: RecipeCardProps) {
   const { toggleWishlistStatus, deleteRecipeById } = useRecipesStore();
   const navigate = useNavigate();
   const [isDeleting, setIsDeleting] = React.useState(false);
@@ -73,7 +74,9 @@ export function RecipeCard({ recipe, index = 0, onEditClick }: RecipeCardProps) 
         />
         <div className="absolute top-2 right-2 flex gap-2">
           <button
+            type="button"
             onClick={handleWishlistToggle}
+            aria-label={recipe.isWishlisted ? `Remove ${recipe.title} from wishlist` : `Add ${recipe.title} to wishlist`}
             className={cn(
               'p-2 rounded-full bg-white/90 backdrop-blur-sm transition-colors',
               recipe.isWishlisted
@@ -86,15 +89,25 @@ export function RecipeCard({ recipe, index = 0, onEditClick }: RecipeCardProps) 
             />
           </button>
           <button
+            type="button"
             onClick={handleEdit}
-            className="p-2 rounded-full bg-white/90 backdrop-blur-sm text-gray-400 hover:text-blue-500 transition-colors"
+            aria-label={`Edit ${recipe.title}`}
+            className={cn(
+              'p-2 rounded-full bg-white/90 backdrop-blur-sm text-gray-400 hover:text-blue-500 transition-colors',
+              readOnly && 'hidden'
+            )}
           >
             <Edit className="w-5 h-5" />
           </button>
           <button
+            type="button"
             onClick={handleDelete}
             disabled={isDeleting}
-            className="p-2 rounded-full bg-white/90 backdrop-blur-sm text-gray-400 hover:text-red-500 transition-colors disabled:opacity-50"
+            aria-label={`Delete ${recipe.title}`}
+            className={cn(
+              'p-2 rounded-full bg-white/90 backdrop-blur-sm text-gray-400 hover:text-red-500 transition-colors disabled:opacity-50',
+              readOnly && 'hidden'
+            )}
           >
             <Trash2 className="w-5 h-5" />
           </button>
@@ -129,4 +142,3 @@ export function RecipeCard({ recipe, index = 0, onEditClick }: RecipeCardProps) 
     </motion.div>
   );
 }
-
