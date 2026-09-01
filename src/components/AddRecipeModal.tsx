@@ -363,7 +363,8 @@ export function AddRecipeModal({ open, onOpenChange }: AddRecipeModalProps) {
                   variant={inputMode === 'url' ? 'default' : 'outline'}
                   size="sm"
                   onClick={() => setInputMode('url')}
-                  className="flex-1"
+                  aria-pressed={inputMode === 'url'}
+                  className="pill h-10 flex-1"
                 >
                   Enter URL
                 </Button>
@@ -371,13 +372,13 @@ export function AddRecipeModal({ open, onOpenChange }: AddRecipeModalProps) {
                   variant={inputMode === 'text' ? 'default' : 'outline'}
                   size="sm"
                   onClick={() => setInputMode('text')}
-                  className="flex-1"
+                  aria-pressed={inputMode === 'text'}
+                  className="pill h-10 flex-1"
                 >
                   <FileText className="w-4 h-4 mr-2" />
                   Paste Content
                 </Button>
               </div>
-
               {inputMode === 'url' ? (
                 <div>
                   <label className="text-sm font-medium mb-2 block">Recipe URL</label>
@@ -392,7 +393,11 @@ export function AddRecipeModal({ open, onOpenChange }: AddRecipeModalProps) {
                       }}
                     />
                     <div className="flex gap-2">
-                      <Button onClick={handleExtract} disabled={isExtracting || !url.trim()}>
+                      <Button
+                        onClick={handleExtract}
+                        disabled={isExtracting || !url.trim()}
+                        className="pill bg-primary font-semibold text-primary-foreground hover:bg-primary/85"
+                      >
                         {isExtracting ? (
                           <>
                             <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -406,7 +411,9 @@ export function AddRecipeModal({ open, onOpenChange }: AddRecipeModalProps) {
                         variant="outline"
                         onClick={handleExtractAndSave}
                         disabled={isExtracting || !url.trim()}
-                        className={isAuthenticated ? undefined : 'hidden'}
+                        className={
+                          isAuthenticated ? 'pill bg-background hover:bg-primary/25' : 'hidden'
+                        }
                       >
                         {isExtracting ? (
                           <>
@@ -619,7 +626,7 @@ export function AddRecipeModal({ open, onOpenChange }: AddRecipeModalProps) {
                   <Button
                     onClick={handleSaveImage}
                     disabled={!hasExportableContent || isSavingImage}
-                    className="w-full"
+                    className="pill h-12 w-full bg-primary font-semibold text-primary-foreground hover:bg-primary/85"
                   >
                     {isSavingImage ? (
                       <>
@@ -638,7 +645,7 @@ export function AddRecipeModal({ open, onOpenChange }: AddRecipeModalProps) {
                       variant="outline"
                       onClick={handlePrint}
                       disabled={!hasExportableContent}
-                      className="flex-1"
+                      className="pill h-11 flex-1 bg-background hover:bg-primary/25"
                     >
                       <Printer className="w-4 h-4 mr-2" />
                       PDF
@@ -647,7 +654,7 @@ export function AddRecipeModal({ open, onOpenChange }: AddRecipeModalProps) {
                       variant="outline"
                       onClick={handleDownload}
                       disabled={!hasExportableContent}
-                      className="flex-1"
+                      className="pill h-11 flex-1 bg-background hover:bg-primary/25"
                     >
                       <Download className="w-4 h-4 mr-2" />
                       Text file
@@ -660,7 +667,11 @@ export function AddRecipeModal({ open, onOpenChange }: AddRecipeModalProps) {
 
                 <div className="border-t pt-3">
                   <div className="flex gap-2">
-                    <Button variant="secondary" onClick={handleSave} className="flex-1">
+                    <Button
+                      variant="secondary"
+                      onClick={handleSave}
+                      className="pill h-11 flex-1 bg-foreground font-semibold text-background hover:bg-foreground/85"
+                    >
                       {isAuthenticated ? 'Save to my collection' : 'Sign in to build a recipe book'}
                     </Button>
                     <Button

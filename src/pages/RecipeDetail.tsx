@@ -142,7 +142,7 @@ export function RecipeDetail() {
           className="max-w-4xl mx-auto"
         >
           {/* Image */}
-          <div className="relative h-96 rounded-2xl overflow-hidden mb-8 shadow-lg">
+          <div className="rounded-3xl border-2 relative h-96 overflow-hidden border-foreground/25 mb-8">
             <img
               src={recipe.image}
               alt={recipe.title}
@@ -157,9 +157,12 @@ export function RecipeDetail() {
           <div className="mb-8">
             <div className="flex items-start justify-between mb-4">
               <div className="flex-1">
-                <h1 className="text-4xl font-bold mb-4">{recipe.title}</h1>
+                <h1 className="font-display text-5xl font-bold mb-4">{recipe.title}</h1>
                 <div className="flex items-center gap-4 mb-4">
-                  <Badge variant="secondary" className="text-lg px-3 py-1">
+                  <Badge
+                    variant="secondary"
+                    className="pill bg-primary px-4 py-1 text-base font-semibold text-primary-foreground"
+                  >
                     {recipe.cuisine}
                   </Badge>
                   <RatingStars
@@ -250,12 +253,14 @@ export function RecipeDetail() {
             transition={{ delay: 0.1 }}
             className="mb-8"
           >
-            <h2 className="text-2xl font-semibold mb-4">Ingredients</h2>
-            <div className="bg-card rounded-lg p-6 shadow-sm">
+            <h2 className="mb-4 flex items-center gap-3 font-display text-3xl font-extrabold tracking-tight">
+              Ingredients
+            </h2>
+            <div className="rounded-3xl border-2 border-foreground bg-card p-6">
               <ul className="space-y-2">
                 {recipe.ingredients.map((ingredient, index) => (
                   <li key={index} className="flex items-start">
-                    <span className="text-primary mr-2">•</span>
+                    <span className="mr-3 mt-2 h-2 w-2 flex-shrink-0 rounded-full bg-primary ring-1 ring-foreground/20" />
                     <span>{ingredient}</span>
                   </li>
                 ))}
@@ -270,12 +275,14 @@ export function RecipeDetail() {
             transition={{ delay: 0.2 }}
             className="mb-8"
           >
-            <h2 className="text-2xl font-semibold mb-4">Instructions</h2>
-            <div className="bg-card rounded-lg p-6 shadow-sm">
+            <h2 className="mb-4 flex items-center gap-3 font-display text-3xl font-extrabold tracking-tight">
+              Instructions
+            </h2>
+            <div className="rounded-3xl border-2 border-foreground bg-card p-6">
               <ol className="space-y-4">
                 {recipe.steps.map((step, index) => (
                   <li key={index} className="flex items-start">
-                    <span className="bg-primary text-primary-foreground rounded-full w-8 h-8 flex items-center justify-center mr-4 flex-shrink-0 font-semibold">
+                    <span className="mr-4 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-primary font-display text-lg font-bold text-primary-foreground">
                       {index + 1}
                     </span>
                     <span className="flex-1 pt-1">{step}</span>

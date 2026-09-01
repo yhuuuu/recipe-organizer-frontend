@@ -1,13 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Search } from 'lucide-react';
+import { Plus, Search, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useRecipesStore } from '@/store/recipesStore';
 import { authService } from '@/services/authService';
-import { RecipeCard } from '@/components/RecipeCard';
+import { RecipeRow } from '@/components/RecipeRow';
 import { FilterBar } from '@/components/FilterBar';
 import { AddRecipeModal } from '@/components/AddRecipeModal';
 import { EditRecipeModal } from '@/components/EditRecipeModal';
+import { HeroIllustrations } from '@/components/HeroIllustrations';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Recipe } from '@/types/Recipe';
@@ -45,68 +46,126 @@ export function Home() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
-        {/* Header with User Welcome */}
+      <div className="relative container mx-auto px-4 py-8">
+        {/* Hero — white, like the reference. Lemon appears only as accent marks. */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4"
+          className="mb-12 px-2 py-10 sm:px-4 sm:py-16"
         >
-          <div>
-            <h1 className="text-4xl font-bold">{isAuthenticated ? 'My Recipes' : 'Recipe Organizer'}</h1>
-            {isAuthenticated && user.username ? (
-              <p className="text-muted-foreground mt-1">
-                Welcome back, <span className="font-medium text-foreground">{user.username}</span>!
+          <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,24rem)] lg:gap-14">
+            <div>
+              <p className="mb-5 text-xs font-bold uppercase tracking-[0.25em]">
+                Cook. Save. Enjoy.
               </p>
-            ) : (
-              <p className="text-muted-foreground mt-1">
-                Paste any recipe link and let AI turn it into a clean, structured recipe.
-              </p>
-            )}
+              <h1 className="max-w-4xl font-display text-5xl font-extrabold leading-[0.95] tracking-tight sm:text-6xl lg:text-7xl">
+                {isAuthenticated
+                  ? 'Your kitchen, beautifully organized'
+                  : 'Any recipe link, clean and readable'}
+              </h1>
+
+              {isAuthenticated && user.username ? (
+                <p className="mt-6 max-w-xl text-lg">
+                  Welcome back, <span className="font-bold">{user.username}</span> — pick up where
+                  you left off.
+                </p>
+              ) : (
+                <p className="mt-6 max-w-xl text-lg">
+                  Paste a link, let AI do the reading, and keep the result on your phone. No account
+                  needed.
+                </p>
+              )}
+
+              <Button
+                onClick={() => setIsModalOpen(true)}
+                size="lg"
+                className="mt-9 h-14 rounded-full border-[3px] border-primary bg-background px-8 text-base font-semibold text-foreground hover:bg-primary/25 focus-visible:ring-foreground"
+              >
+                <Sparkles className="mr-2 h-5 w-5" />
+                {isAuthenticated ? 'Add a recipe' : 'Try AI extraction'}
+              </Button>
+            </div>
+
+            <HeroIllustrations />
           </div>
-          <Button onClick={() => setIsModalOpen(true)} size="lg">
-            <Plus className="w-5 h-5 mr-2" />
-            {isAuthenticated ? 'Add Recipe' : 'Try AI Extraction'}
-          </Button>
+
+          {/* States the guest offer up front, before the sample recipes. */}
+          {!isAuthenticated && (
+            <dl className="mt-12 grid max-w-2xl grid-cols-2 gap-6 border-t-2 border-foreground/15 pt-8 sm:grid-cols-3">
+              <div>
+                <dt className="text-[0.7rem] font-bold uppercase tracking-widest opacity-60">
+                  Free tries
+                </dt>
+                <dd className="mt-1.5">
+                  <span className="bg-primary px-2 py-0.5 font-display text-lg font-bold">
+                    5 / day
+                  </span>
+                </dd>
+              </div>
+              <div>
+                <dt className="text-[0.7rem] font-bold uppercase tracking-widest opacity-60">
+                  Sign up
+                </dt>
+                <dd className="mt-1.5">
+                  <span className="bg-primary px-2 py-0.5 font-display text-lg font-bold">
+                    Not required
+                  </span>
+                </dd>
+              </div>
+              <div>
+                <dt className="text-[0.7rem] font-bold uppercase tracking-widest opacity-60">
+                  Save as
+                </dt>
+                <dd className="mt-1.5">
+                  <span className="bg-primary px-2 py-0.5 font-display text-lg font-bold">
+                    Image · PDF
+                  </span>
+                </dd>
+              </div>
+            </dl>
+          )}
         </motion.div>
 
         {!isAuthenticated && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-6 rounded-lg border border-primary/30 bg-primary/5 px-4 py-3 text-sm"
+            className="mb-8 rounded-3xl border-2 border-foreground px-6 py-5"
           >
-            <p>
-              You're viewing <span className="font-medium">sample recipes</span>. Try the AI
-              extraction and download the result to your device —{' '}
+            <p className="text-base">
+              You're browsing <span className="font-semibold">sample recipes</span>. Try the AI
+              extraction and save the result straight to your device —{' '}
               <button
                 type="button"
                 onClick={() => navigate('/auth')}
-                className="font-medium text-primary underline underline-offset-4"
+                className="ink-link"
               >
                 sign in
               </button>{' '}
-              only if you want to build a searchable recipe book.
+              only if you want a searchable recipe book.
             </p>
           </motion.div>
         )}
 
-        {/* Search Bar */}
+        {/* Search + filters */}
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
           className="mb-6"
         >
+          <h2 className="mb-6 font-display text-3xl font-extrabold tracking-tight sm:text-4xl">
+            Fresh flavors for every mood
+          </h2>
           <div className="relative max-w-md">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+            <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               type="text"
               placeholder="Search by title or ingredient..."
               aria-label="Search recipes by title or ingredient"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
+              className="h-12 rounded-full border-2 border-foreground pl-11"
             />
           </div>
         </motion.div>
@@ -114,33 +173,42 @@ export function Home() {
         {/* Filter Bar */}
         <FilterBar />
 
-        {/* Recipes Grid */}
+        {/* Recipe list */}
         {isLoading ? (
-          <div className="flex justify-center items-center py-20">
-            <div className="text-muted-foreground">Loading recipes...</div>
+          <div className="py-20 text-center">
+            <p className="font-display text-2xl font-bold">Loading recipes…</p>
           </div>
         ) : recipes.length === 0 ? (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="text-center py-20"
+            className="rounded-3xl border-2 border-foreground px-6 py-16 text-center"
           >
-            <p className="text-muted-foreground text-lg mb-4">
-              {searchQuery ? 'No recipes found matching your search.' : 'No recipes yet.'}
+            <p className="mb-6 font-display text-3xl font-extrabold">
+              {searchQuery ? 'Nothing matches that search.' : 'No recipes yet.'}
             </p>
-            <Button onClick={() => setIsModalOpen(true)} variant="outline">
-              <Plus className="w-4 h-4 mr-2" />
-              Add Your First Recipe
+            <Button
+              onClick={() => setIsModalOpen(true)}
+              variant="outline"
+              className="pill h-12 px-6 hover:bg-primary"
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Add your first recipe
             </Button>
           </motion.div>
         ) : (
           <>
-            <p className="mb-4 text-sm text-muted-foreground" aria-live="polite">
+            <p className="mb-2 text-sm text-muted-foreground" aria-live="polite">
               {recipes.length} {recipes.length === 1 ? 'recipe' : 'recipes'} found
             </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {/*
+              Full container width. The card's columns are fractional rather
+              than a fixed photo width, so the image keeps growing with the
+              viewport instead of letting the lemon panel absorb all the space.
+            */}
+            <div>
               {recipes.map((recipe, index) => (
-                <RecipeCard
+                <RecipeRow
                   key={recipe.id}
                   recipe={recipe}
                   index={index}

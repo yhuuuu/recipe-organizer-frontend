@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { Heart } from 'lucide-react';
 import { useRecipesStore } from '@/store/recipesStore';
 import { authService } from '@/services/authService';
-import { RecipeCard } from '@/components/RecipeCard';
+import { RecipeRow } from '@/components/RecipeRow';
 
 export function Wishlist() {
   const navigate = useNavigate();
@@ -31,8 +31,10 @@ export function Wishlist() {
           className="mb-8"
         >
           <div className="flex items-center gap-3 mb-2">
-            <Heart className="w-8 h-8 text-red-500 fill-current" />
-            <h1 className="text-4xl font-bold">My Wishlist</h1>
+            <Heart className="w-7 h-7 text-red-500 fill-current" />
+            <h1 className="font-display text-4xl font-extrabold tracking-tight sm:text-5xl">
+              My Wishlist
+            </h1>
           </div>
           <p className="text-muted-foreground">
             {user.username && <span className="font-medium">{user.username}'s </span>}
@@ -44,17 +46,16 @@ export function Wishlist() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="text-center py-20"
+            className="lemon-panel px-6 py-16 text-center"
           >
-            <Heart className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-            <p className="text-muted-foreground text-lg">
+            <p className="font-display text-2xl font-bold">
               Your wishlist is empty. Start adding recipes to save them for later!
             </p>
           </motion.div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div>
             {wishlistedRecipes.map((recipe, index) => (
-              <RecipeCard key={recipe.id} recipe={recipe} index={index} />
+              <RecipeRow key={recipe.id} recipe={recipe} index={index} />
             ))}
           </div>
         )}
