@@ -135,7 +135,7 @@ export function Auth() {
               type="button"
               onClick={handleToggleMode}
               disabled={loading}
-              className="ml-1 text-primary hover:underline font-medium disabled:opacity-50"
+              className="ml-1 ink-link disabled:opacity-50"
             >
               {isLogin ? 'Register now' : 'Login now'}
             </button>

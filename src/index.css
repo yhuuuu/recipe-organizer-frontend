@@ -5,47 +5,52 @@
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --foreground: 0 0% 8%;
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 0 0% 8%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 221.2 83.2% 53.3%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
-    --radius: 0.5rem;
+    --popover-foreground: 0 0% 8%;
+    /*
+     * Lemon (#f8fc52). Reserved for FILLS only — never for text or icons on
+     * white, where it fails contrast. Anything sitting on lemon uses
+     * --primary-foreground (near-black), which passes AAA.
+     */
+    --primary: 61 96% 65%;
+    --primary-foreground: 0 0% 8%;
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 8%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 40%;
+    --accent: 61 96% 65%;
+    --accent-foreground: 0 0% 8%;
+    --destructive: 0 72% 45%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 88%;
+    --input: 0 0% 82%;
+    --ring: 0 0% 8%;
+    --radius: 1rem;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 224.3 76.3% 48%;
+    --background: 0 0% 7%;
+    --foreground: 0 0% 96%;
+    --card: 0 0% 10%;
+    --card-foreground: 0 0% 96%;
+    --popover: 0 0% 10%;
+    --popover-foreground: 0 0% 96%;
+    --primary: 61 96% 65%;
+    --primary-foreground: 0 0% 8%;
+    --secondary: 0 0% 16%;
+    --secondary-foreground: 0 0% 96%;
+    --muted: 0 0% 16%;
+    --muted-foreground: 0 0% 65%;
+    --accent: 61 96% 65%;
+    --accent-foreground: 0 0% 8%;
+    --destructive: 0 62% 50%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 22%;
+    --input: 0 0% 26%;
+    --ring: 61 96% 65%;
   }
 }
 
@@ -55,6 +60,36 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer components {
+  /* Solid lemon panel — the signature block of the design. */
+  .lemon-panel {
+    @apply bg-primary text-primary-foreground rounded-3xl;
+  }
+
+  /* Pill button outline, matching the reference's "Explore our menu" CTA. */
+  .pill {
+    @apply rounded-full border-2 border-foreground;
+  }
+
+  /*
+   * The reference CTA: white pill, lemon outline, ink label. Apply as utilities
+   * on <Button> (border-primary bg-background text-foreground) rather than a
+   * custom class — tailwind-merge cannot tell a custom class conflicts with the
+   * variant's bg-primary, so the yellow fill would survive and win.
+   *
+   * Note the lemon border is decorative only: at ~1.1:1 against white it carries
+   * no meaning on its own, so the ink label does the signalling and focus uses
+   * an ink ring rather than relying on the lemon edge.
+   */
+  /*
+   * Text link styling. Deliberately ink + underline rather than the lemon
+   * accent: lemon on white is roughly 1.1:1 contrast and unreadable as text.
+   */
+  .ink-link {
+    @apply font-medium underline decoration-2 underline-offset-4 hover:decoration-[3px];
   }
 }
 
